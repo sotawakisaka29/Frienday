@@ -6,13 +6,33 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		06E587633010BA170037D842 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587623010BA170037D842 /* FirebaseAuth */; };
+		06E587653010BA170037D842 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587643010BA170037D842 /* FirebaseCore */; };
+		06E587673010BA170037D842 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587663010BA170037D842 /* FirebaseFirestore */; };
+		06E587693010C0010037D842 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587683010C0010037D842 /* GoogleSignIn */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		06E5874D3010B3280037D842 /* Frienday.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Frienday.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		06E5876B3010C0020037D842 /* Exceptions for "Frienday" folder in "Frienday" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 06E5874C3010B3280037D842 /* Frienday */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		06E5874F3010B3280037D842 /* Frienday */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				06E5876B3010C0020037D842 /* Exceptions for "Frienday" folder in "Frienday" target */,
+			);
 			path = Frienday;
 			sourceTree = "<group>";
 		};
@@ -23,6 +43,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				06E587653010BA170037D842 /* FirebaseCore in Frameworks */,
+				06E587633010BA170037D842 /* FirebaseAuth in Frameworks */,
+				06E587673010BA170037D842 /* FirebaseFirestore in Frameworks */,
+				06E587693010C0010037D842 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +89,10 @@
 			);
 			name = Frienday;
 			packageProductDependencies = (
+				06E587623010BA170037D842 /* FirebaseAuth */,
+				06E587643010BA170037D842 /* FirebaseCore */,
+				06E587663010BA170037D842 /* FirebaseFirestore */,
+				06E587683010C0010037D842 /* GoogleSignIn */,
 			);
 			productName = Frienday;
 			productReference = 06E5874D3010B3280037D842 /* Frienday.app */;
@@ -94,6 +122,10 @@
 			);
 			mainGroup = 06E587443010B3280037D842;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				06E587613010BA170037D842 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				06E5876A3010C0010037D842 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 06E5874E3010B3280037D842 /* Products */;
 			projectDirPath = "";
@@ -255,12 +287,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DTM7CUJQWQ;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Frienday/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -287,12 +315,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DTM7CUJQWQ;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Frienday/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -332,6 +356,48 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		06E587613010BA170037D842 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.16.0;
+			};
+		};
+		06E5876A3010C0010037D842 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		06E587623010BA170037D842 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06E587613010BA170037D842 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		06E587643010BA170037D842 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06E587613010BA170037D842 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		06E587663010BA170037D842 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06E587613010BA170037D842 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		06E587683010C0010037D842 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06E5876A3010C0010037D842 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 06E587453010B3280037D842 /* Project object */;
 }
