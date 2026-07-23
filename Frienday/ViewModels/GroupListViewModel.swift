@@ -15,6 +15,7 @@ final class GroupListViewModel {
     private let groupRepository: GroupRepository
     private let userRepository: UserRepository
     private let birthdayService: BirthdayCalculationService
+    private let widgetSyncService: WidgetBirthdaySyncService
 
     private(set) var groups: [BirthdayGroup] = []
     private(set) var summaries: [String: GroupSummary] = [:]
@@ -25,11 +26,13 @@ final class GroupListViewModel {
     init(
         groupRepository: GroupRepository = GroupRepository(),
         userRepository: UserRepository = UserRepository(),
-        birthdayService: BirthdayCalculationService = BirthdayCalculationService()
+        birthdayService: BirthdayCalculationService = BirthdayCalculationService(),
+        widgetSyncService: WidgetBirthdaySyncService? = nil
     ) {
         self.groupRepository = groupRepository
         self.userRepository = userRepository
         self.birthdayService = birthdayService
+        self.widgetSyncService = widgetSyncService ?? WidgetBirthdaySyncService()
     }
 
     func load(userId: String) async {
@@ -56,6 +59,7 @@ final class GroupListViewModel {
         do {
             let group = try await groupRepository.createGroup(name: name, ownerId: userId)
             await load(userId: userId)
+            try? await widgetSyncService.refresh(userId: userId)
             return group
         } catch {
             errorMessage = AppError.map(error).message
@@ -73,6 +77,7 @@ final class GroupListViewModel {
         do {
             try await groupRepository.joinGroup(inviteCode: inviteCode, userId: userId)
             await load(userId: userId)
+            try? await widgetSyncService.refresh(userId: userId)
             return true
         } catch {
             errorMessage = AppError.map(error).message

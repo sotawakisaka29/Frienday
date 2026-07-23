@@ -9,17 +9,55 @@
 /* Begin PBXBuildFile section */
 		0689AF6D30112ACD00151B9A /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 0689AF6C30112ACD00151B9A /* FirebaseStorage */; };
 		0689AF923011CCB200151B9A /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 0689AF913011CCB200151B9A /* FirebaseMessaging */; };
+		0689AF9A3011E73E00151B9A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0689AF993011E73E00151B9A /* WidgetKit.framework */; };
+		0689AF9C3011E73E00151B9A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0689AF9B3011E73E00151B9A /* SwiftUI.framework */; };
+		0689AFA93011E73F00151B9A /* FriendayWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0689AF983011E73E00151B9A /* FriendayWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		06E587633010BA170037D842 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587623010BA170037D842 /* FirebaseAuth */; };
 		06E587653010BA170037D842 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587643010BA170037D842 /* FirebaseCore */; };
 		06E587673010BA170037D842 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587663010BA170037D842 /* FirebaseFirestore */; };
 		06E587693010C0010037D842 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587683010C0010037D842 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		0689AFA73011E73F00151B9A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 06E587453010B3280037D842 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0689AF973011E73E00151B9A;
+			remoteInfo = FriendayWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0689AFAE3011E73F00151B9A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0689AFA93011E73F00151B9A /* FriendayWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		0689AF983011E73E00151B9A /* FriendayWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FriendayWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		0689AF993011E73E00151B9A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		0689AF9B3011E73E00151B9A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		0689AFAF3011E79200151B9A /* FriendayWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FriendayWidgetExtension.entitlements; sourceTree = "<group>"; };
 		06E5874D3010B3280037D842 /* Frienday.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Frienday.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0689AFAD3011E73F00151B9A /* Exceptions for "FriendayWidget" folder in "FriendayWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0689AF973011E73E00151B9A /* FriendayWidgetExtension */;
+		};
 		06E5876B3010C0020037D842 /* Exceptions for "Frienday" folder in "Frienday" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -30,6 +68,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		0689AF9D3011E73E00151B9A /* FriendayWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0689AFAD3011E73F00151B9A /* Exceptions for "FriendayWidget" folder in "FriendayWidgetExtension" target */,
+			);
+			path = FriendayWidget;
+			sourceTree = "<group>";
+		};
 		06E5874F3010B3280037D842 /* Frienday */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -41,6 +87,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0689AF953011E73E00151B9A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0689AF9C3011E73E00151B9A /* SwiftUI.framework in Frameworks */,
+				0689AF9A3011E73E00151B9A /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		06E5874A3010B3280037D842 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -60,6 +115,8 @@
 		0689AF6B30112ACD00151B9A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0689AF993011E73E00151B9A /* WidgetKit.framework */,
+				0689AF9B3011E73E00151B9A /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -67,7 +124,9 @@
 		06E587443010B3280037D842 = {
 			isa = PBXGroup;
 			children = (
+				0689AFAF3011E79200151B9A /* FriendayWidgetExtension.entitlements */,
 				06E5874F3010B3280037D842 /* Frienday */,
+				0689AF9D3011E73E00151B9A /* FriendayWidget */,
 				0689AF6B30112ACD00151B9A /* Frameworks */,
 				06E5874E3010B3280037D842 /* Products */,
 			);
@@ -77,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				06E5874D3010B3280037D842 /* Frienday.app */,
+				0689AF983011E73E00151B9A /* FriendayWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,6 +144,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0689AF973011E73E00151B9A /* FriendayWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0689AFAA3011E73F00151B9A /* Build configuration list for PBXNativeTarget "FriendayWidgetExtension" */;
+			buildPhases = (
+				0689AF943011E73E00151B9A /* Sources */,
+				0689AF953011E73E00151B9A /* Frameworks */,
+				0689AF963011E73E00151B9A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0689AF9D3011E73E00151B9A /* FriendayWidget */,
+			);
+			name = FriendayWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = FriendayWidgetExtension;
+			productReference = 0689AF983011E73E00151B9A /* FriendayWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		06E5874C3010B3280037D842 /* Frienday */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 06E587583010B3280037D842 /* Build configuration list for PBXNativeTarget "Frienday" */;
@@ -91,10 +173,12 @@
 				06E587493010B3280037D842 /* Sources */,
 				06E5874A3010B3280037D842 /* Frameworks */,
 				06E5874B3010B3280037D842 /* Resources */,
+				0689AFAE3011E73F00151B9A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0689AFA83011E73F00151B9A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				06E5874F3010B3280037D842 /* Frienday */,
@@ -122,6 +206,9 @@
 				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
+					0689AF973011E73E00151B9A = {
+						CreatedOnToolsVersion = 26.5;
+					};
 					06E5874C3010B3280037D842 = {
 						CreatedOnToolsVersion = 26.5;
 					};
@@ -153,11 +240,19 @@
 			projectRoot = "";
 			targets = (
 				06E5874C3010B3280037D842 /* Frienday */,
+				0689AF973011E73E00151B9A /* FriendayWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0689AF963011E73E00151B9A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		06E5874B3010B3280037D842 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -168,6 +263,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0689AF943011E73E00151B9A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		06E587493010B3280037D842 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -177,7 +279,77 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		0689AFA83011E73F00151B9A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0689AF973011E73E00151B9A /* FriendayWidgetExtension */;
+			targetProxy = 0689AFA73011E73F00151B9A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0689AFAB3011E73F00151B9A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FriendayWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DTM7CUJQWQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FriendayWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FriendayWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Wakisaka.Wakiso.Frienday.FriendayWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0689AFAC3011E73F00151B9A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FriendayWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DTM7CUJQWQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FriendayWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FriendayWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Wakisaka.Wakiso.Frienday.FriendayWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		06E587563010B3280037D842 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -360,6 +532,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0689AFAA3011E73F00151B9A /* Build configuration list for PBXNativeTarget "FriendayWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0689AFAB3011E73F00151B9A /* Debug */,
+				0689AFAC3011E73F00151B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		06E587483010B3280037D842 /* Build configuration list for PBXProject "Frienday" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

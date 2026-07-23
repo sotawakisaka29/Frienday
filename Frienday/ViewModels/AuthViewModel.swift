@@ -15,6 +15,7 @@ import UIKit
 final class AuthViewModel {
     private let authService: AuthServiceProtocol
     private let pushNotificationService: PushNotificationService
+    private let widgetSyncService: WidgetBirthdaySyncService
     private var authStateHandle: AuthStateDidChangeListenerHandle?
 
     private(set) var currentUser: User?
@@ -25,16 +26,19 @@ final class AuthViewModel {
         let authService = AuthService()
         self.authService = authService
         pushNotificationService = .shared
+        widgetSyncService = WidgetBirthdaySyncService()
         currentUser = authService.currentUser
         startAuthStateListener()
     }
 
     init(
         authService: AuthServiceProtocol,
-        pushNotificationService: PushNotificationService
+        pushNotificationService: PushNotificationService,
+        widgetSyncService: WidgetBirthdaySyncService? = nil
     ) {
         self.authService = authService
         self.pushNotificationService = pushNotificationService
+        self.widgetSyncService = widgetSyncService ?? WidgetBirthdaySyncService()
         currentUser = authService.currentUser
         startAuthStateListener()
     }
@@ -89,6 +93,7 @@ final class AuthViewModel {
             }
             try authService.signOut()
             currentUser = nil
+            widgetSyncService.clear()
             errorMessage = nil
             stopAuthStateListener()
         } catch {
@@ -115,6 +120,7 @@ final class AuthViewModel {
             }
             try await authService.deleteAccount()
             currentUser = nil
+            widgetSyncService.clear()
             errorMessage = nil
             stopAuthStateListener()
         } catch {

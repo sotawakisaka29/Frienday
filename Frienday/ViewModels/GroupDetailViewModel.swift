@@ -15,6 +15,7 @@ final class GroupDetailViewModel {
     private let groupRepository: GroupRepository
     private let userRepository: UserRepository
     private let birthdayService: BirthdayCalculationService
+    private let widgetSyncService: WidgetBirthdaySyncService
 
     let group: BirthdayGroup
     private(set) var items: [BirthdayDisplayItem] = []
@@ -33,12 +34,14 @@ final class GroupDetailViewModel {
         group: BirthdayGroup,
         groupRepository: GroupRepository = GroupRepository(),
         userRepository: UserRepository = UserRepository(),
-        birthdayService: BirthdayCalculationService = BirthdayCalculationService()
+        birthdayService: BirthdayCalculationService = BirthdayCalculationService(),
+        widgetSyncService: WidgetBirthdaySyncService? = nil
     ) {
         self.group = group
         self.groupRepository = groupRepository
         self.userRepository = userRepository
         self.birthdayService = birthdayService
+        self.widgetSyncService = widgetSyncService ?? WidgetBirthdaySyncService()
     }
 
     func load(userId: String) async {
@@ -105,6 +108,7 @@ final class GroupDetailViewModel {
     func leave(userId: String) async -> Bool {
         do {
             try await groupRepository.leaveGroup(group: group, userId: userId)
+            try? await widgetSyncService.refresh(userId: userId)
             return true
         } catch {
             errorMessage = AppError.map(error).message
@@ -120,6 +124,7 @@ final class GroupDetailViewModel {
 
         do {
             try await groupRepository.deleteGroup(group: group, requesterId: userId)
+            try? await widgetSyncService.refresh(userId: userId)
             return true
         } catch {
             errorMessage = AppError.map(error).message

@@ -16,6 +16,7 @@ final class SettingsViewModel {
     private let groupRepository: GroupRepository
     private let notificationService: NotificationService
     private let profileImageService: ProfileImageService
+    private let widgetSyncService: WidgetBirthdaySyncService
 
     private(set) var profile: AppUser?
     var profileDisplayName = ""
@@ -39,12 +40,14 @@ final class SettingsViewModel {
         userRepository: UserRepository = UserRepository(),
         groupRepository: GroupRepository = GroupRepository(),
         notificationService: NotificationService = NotificationService(),
-        profileImageService: ProfileImageService = ProfileImageService()
+        profileImageService: ProfileImageService = ProfileImageService(),
+        widgetSyncService: WidgetBirthdaySyncService? = nil
     ) {
         self.userRepository = userRepository
         self.groupRepository = groupRepository
         self.notificationService = notificationService
         self.profileImageService = profileImageService
+        self.widgetSyncService = widgetSyncService ?? WidgetBirthdaySyncService()
         let notificationSettings = notificationService.loadSettings()
         self.notificationSettings = notificationSettings
         savedNotificationSettings = notificationSettings
@@ -216,6 +219,7 @@ final class SettingsViewModel {
             profile.imageColorHex = profileImageColorHex
 
             try await userRepository.updateProfile(profile)
+            try? await widgetSyncService.refresh(userId: profile.userId)
 
             if removesProfileImage, previousImageURL != nil {
                 try? await profileImageService.deleteProfileImage(userId: profile.userId)

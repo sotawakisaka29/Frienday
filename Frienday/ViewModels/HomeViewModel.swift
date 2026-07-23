@@ -15,6 +15,7 @@ final class HomeViewModel {
     private let groupRepository: GroupRepository
     private let userRepository: UserRepository
     private let birthdayService: BirthdayCalculationService
+    private let widgetSyncService: WidgetBirthdaySyncService
 
     private(set) var groups: [BirthdayGroup] = []
     private(set) var allBirthdayItems: [BirthdayDisplayItem] = []
@@ -46,11 +47,13 @@ final class HomeViewModel {
     init(
         groupRepository: GroupRepository = GroupRepository(),
         userRepository: UserRepository = UserRepository(),
-        birthdayService: BirthdayCalculationService = BirthdayCalculationService()
+        birthdayService: BirthdayCalculationService = BirthdayCalculationService(),
+        widgetSyncService: WidgetBirthdaySyncService? = nil
     ) {
         self.groupRepository = groupRepository
         self.userRepository = userRepository
         self.birthdayService = birthdayService
+        self.widgetSyncService = widgetSyncService ?? WidgetBirthdaySyncService()
     }
 
     func load(userId: String) async {
@@ -61,6 +64,7 @@ final class HomeViewModel {
             let loadedGroups = try await groupRepository.fetchUserGroups(userId: userId)
             groups = loadedGroups
             allBirthdayItems = try await loadBirthdayItems(groups: loadedGroups)
+            widgetSyncService.save(items: allBirthdayItems)
 
             if let selectedGroupId,
                !loadedGroups.contains(where: { $0.groupId == selectedGroupId }) {
@@ -75,7 +79,9 @@ final class HomeViewModel {
 
     func loadBirthdayItems(userId: String) async throws -> [BirthdayDisplayItem] {
         let groups = try await groupRepository.fetchUserGroups(userId: userId)
-        return try await loadBirthdayItems(groups: groups)
+        let items = try await loadBirthdayItems(groups: groups)
+        widgetSyncService.save(items: items)
+        return items
     }
 
     /// ホームに表示するグループを切り替えます。nilの場合は全グループを表示します。
