@@ -176,7 +176,7 @@ struct CalendarDayCell: View {
                 .frame(maxWidth: .infinity)
 
             ForEach(items.prefix(3)) { item in
-                birthdayLabel(item.user.displayName)
+                birthdayLabel(item.user.displayName, colorHex: item.user.imageColorHex)
             }
 
             if items.count > 3 {
@@ -197,7 +197,7 @@ struct CalendarDayCell: View {
     }
 
     /// 誕生日の人の表示名を、1行のラベルとして表示します。
-    private func birthdayLabel(_ displayName: String) -> some View {
+    private func birthdayLabel(_ displayName: String, colorHex: String) -> some View {
         Text(displayName)
             .font(.system(size: labelFontSize, weight: .semibold))
             .foregroundStyle(.white)
@@ -206,7 +206,7 @@ struct CalendarDayCell: View {
             .padding(.horizontal, 1)
             .padding(.vertical, 3)
             .frame(maxWidth: .infinity)
-            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 4))
+            .background(Color(profileHex: colorHex), in: RoundedRectangle(cornerRadius: 4))
     }
 
     /// 日曜日と祝日は赤、土曜日は青、平日は標準色を返します。

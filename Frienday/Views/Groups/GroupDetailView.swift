@@ -53,18 +53,22 @@ struct GroupDetailView: View {
                     ContentUnavailableView("メンバーを読み込めません", systemImage: "person")
                 } else {
                     ForEach(viewModel.items) { item in
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text(item.user.displayName)
-                                    .font(.headline)
-                                Spacer()
-                                Text(item.member.role.label)
-                                    .font(.caption)
+                        HStack(spacing: 12) {
+                            ProfileAvatarView(user: item.user, size: 48)
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text(item.user.displayName)
+                                        .font(.headline)
+                                    Spacer()
+                                    Text(item.member.role.label)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Text(item.visibleBirthdayText)
+                                Text("あと\(item.daysUntilBirthday)日")
                                     .foregroundStyle(.secondary)
                             }
-                            Text(item.visibleBirthdayText)
-                            Text("あと\(item.daysUntilBirthday)日")
-                                .foregroundStyle(.secondary)
                         }
                         .accessibilityLabel("\(item.user.displayName)、\(item.visibleBirthdayText)、\(item.member.role.label)、あと\(item.daysUntilBirthday)日")
                     }

@@ -15,10 +15,16 @@ final class SettingsViewModel {
     private let userRepository: UserRepository
     private let groupRepository: GroupRepository
     private let notificationService: NotificationService
+    private let profileImageService: ProfileImageService
 
     private(set) var profile: AppUser?
     var profileDisplayName = ""
     var profileBirthday = Date()
+    private(set) var profileImageURL: String?
+    private(set) var pendingProfileImageData: Data?
+    private var pendingProfileImageContentType = "image/jpeg"
+    var profileImageColorHex = ProfileColor.blue.rawValue
+    private var removesProfileImage = false
     private(set) var hasProfileChanges = false
     var notificationSettings: NotificationSettings
     private(set) var savedNotificationSettings: NotificationSettings
@@ -31,11 +37,13 @@ final class SettingsViewModel {
     init(
         userRepository: UserRepository = UserRepository(),
         groupRepository: GroupRepository = GroupRepository(),
-        notificationService: NotificationService = NotificationService()
+        notificationService: NotificationService = NotificationService(),
+        profileImageService: ProfileImageService = ProfileImageService()
     ) {
         self.userRepository = userRepository
         self.groupRepository = groupRepository
         self.notificationService = notificationService
+        self.profileImageService = profileImageService
         let notificationSettings = notificationService.loadSettings()
         self.notificationSettings = notificationSettings
         savedNotificationSettings = notificationSettings
@@ -43,6 +51,10 @@ final class SettingsViewModel {
 
     var hasNotificationChanges: Bool {
         notificationSettings != savedNotificationSettings
+    }
+
+    var hasProfileImage: Bool {
+        pendingProfileImageData != nil || profileImageURL != nil
     }
 
     /// 表示名の入力を反映し、保存済みデータとの差を更新します。
@@ -57,6 +69,48 @@ final class SettingsViewModel {
         profileBirthday = birthday
         updateProfileChangeState()
         clearFeedback()
+    }
+
+    /// 選択した画像を保存待ちのプロフィール画像として保持します。
+    func setProfileImage(data: Data, contentType: String) {
+        guard data.count <= ProfileImageService.maximumImageSize else {
+            errorMessage = AppError.profileImageTooLarge.message
+            return
+        }
+        guard contentType.hasPrefix("image/") else {
+            errorMessage = AppError.invalidProfileImage.message
+            return
+        }
+
+        pendingProfileImageData = data
+        pendingProfileImageContentType = contentType
+        removesProfileImage = false
+        updateProfileChangeState()
+        successMessage = nil
+        errorMessage = nil
+    }
+
+    /// プロフィール画像の削除を次回保存時に反映します。
+    func removeProfileImage() {
+        pendingProfileImageData = nil
+        profileImageURL = nil
+        removesProfileImage = profile?.profileImageURL != nil
+        updateProfileChangeState()
+        clearFeedback()
+    }
+
+    /// イメージカラーを編集中のプロフィールへ反映します。
+    func setProfileImageColor(_ colorHex: String) {
+        guard ProfileColor(rawValue: colorHex) != nil else { return }
+        profileImageColorHex = colorHex
+        updateProfileChangeState()
+        clearFeedback()
+    }
+
+    /// 写真データを読み込めなかったことを画面に表示します。
+    func showProfileImageLoadError() {
+        successMessage = nil
+        errorMessage = AppError.invalidProfileImage.message
     }
 
     /// 通知全体のオン・オフを編集中の設定へ反映します。
@@ -101,6 +155,10 @@ final class SettingsViewModel {
             let profile = try await userRepository.fetchProfile(userId: userId)
             self.profile = profile
             profileDisplayName = profile.displayName
+            profileImageURL = profile.profileImageURL
+            pendingProfileImageData = nil
+            profileImageColorHex = profile.imageColorHex
+            removesProfileImage = false
 
             var components = DateComponents()
             components.year = profile.birthYear
@@ -134,9 +192,30 @@ final class SettingsViewModel {
             profile.birthYear = year
             profile.birthMonth = month
             profile.birthDay = day
+            let previousImageURL = profile.profileImageURL
+
+            if let pendingProfileImageData {
+                profile.profileImageURL = try await profileImageService.uploadProfileImage(
+                    data: pendingProfileImageData,
+                    contentType: pendingProfileImageContentType,
+                    userId: profile.userId
+                )
+            } else if removesProfileImage {
+                profile.profileImageURL = nil
+            }
+            profile.imageColorHex = profileImageColorHex
+
             try await userRepository.updateProfile(profile)
+
+            if removesProfileImage, previousImageURL != nil {
+                try? await profileImageService.deleteProfileImage(userId: profile.userId)
+            }
+
             self.profile = profile
             profileDisplayName = profile.displayName
+            profileImageURL = profile.profileImageURL
+            pendingProfileImageData = nil
+            removesProfileImage = false
             hasProfileChanges = false
             successMessage = "プロフィールを更新しました。"
             errorMessage = nil
@@ -185,6 +264,9 @@ final class SettingsViewModel {
             || components.year != profile.birthYear
             || components.month != profile.birthMonth
             || components.day != profile.birthDay
+            || pendingProfileImageData != nil
+            || removesProfileImage
+            || profileImageColorHex != profile.imageColorHex
     }
 
     func deleteAccount(userId: String, authViewModel: AuthViewModel) async {
@@ -195,6 +277,9 @@ final class SettingsViewModel {
             let groups = try await groupRepository.fetchUserGroups(userId: userId)
             for group in groups {
                 try await groupRepository.leaveGroup(group: group, userId: userId)
+            }
+            if profile?.profileImageURL != nil {
+                try? await profileImageService.deleteProfileImage(userId: userId)
             }
             try await userRepository.deleteProfile(userId: userId)
             notificationService.clearSettings()

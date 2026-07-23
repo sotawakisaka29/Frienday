@@ -9,6 +9,9 @@ import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
 import Foundation
+#if canImport(FirebaseStorage)
+import FirebaseStorage
+#endif
 
 /// Firebase の初期化と共通インスタンスを管理します。
 final class FirebaseManager {
@@ -25,6 +28,13 @@ final class FirebaseManager {
         configure()
         return Firestore.firestore()
     }
+
+#if canImport(FirebaseStorage)
+    var storage: Storage {
+        configure()
+        return Storage.storage()
+    }
+#endif
 
     private init() {}
 

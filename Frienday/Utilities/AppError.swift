@@ -29,6 +29,11 @@ enum AppError: LocalizedError, Equatable {
     case invalidBirthday
     case futureBirthday
     case profileNotLoaded
+    case invalidProfileImage
+    case profileImageTooLarge
+    case firebaseStorageNotConfigured
+    case profileImageUploadFailed
+    case profileImageDeleteFailed
     case invalidGroupName
     case groupNameTooLong
     case groupNotFound
@@ -66,6 +71,11 @@ enum AppError: LocalizedError, Equatable {
         case .invalidBirthday: return "生年月日を正しく入力してください。"
         case .futureBirthday: return "未来の日付は生年月日に設定できません。"
         case .profileNotLoaded: return "プロフィールを読み込めませんでした。画面を開き直して、もう一度お試しください。"
+        case .invalidProfileImage: return "画像ファイルを選択してください。"
+        case .profileImageTooLarge: return "プロフィール画像は5MB以下のものを選択してください。"
+        case .firebaseStorageNotConfigured: return "Firebase Storageの設定が必要です。XcodeでFirebaseStorageをターゲットに追加してください。"
+        case .profileImageUploadFailed: return "プロフィール画像の保存に失敗しました。Storageの設定とSecurity Rulesを確認してください。"
+        case .profileImageDeleteFailed: return "プロフィール画像の削除に失敗しました。"
         case .invalidGroupName: return "グループ名を入力してください。"
         case .groupNameTooLong: return "グループ名は40文字以内で入力してください。"
         case .groupNotFound: return "グループが見つかりません。"

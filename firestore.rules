@@ -32,7 +32,22 @@ service cloud.firestore {
       allow get: if signedIn();
       allow list: if false;
       allow create, update: if isSelf(userId)
-        && !request.resource.data.keys().hasAny(["email", "birthYear"]);
+        && !request.resource.data.keys().hasAny(["email", "birthYear"])
+        && request.resource.data.keys().hasOnly([
+          "userId",
+          "displayName",
+          "birthMonth",
+          "birthDay",
+          "profileImageURL",
+          "imageColorHex",
+          "createdAt",
+          "updatedAt"
+        ])
+        && request.resource.data.userId == userId
+        && request.resource.data.profileImageURL is string
+        && request.resource.data.profileImageURL.size() <= 2048
+        && request.resource.data.imageColorHex is string
+        && request.resource.data.imageColorHex.matches('^#[0-9A-F]{6}$');
       allow delete: if isSelf(userId);
     }
 

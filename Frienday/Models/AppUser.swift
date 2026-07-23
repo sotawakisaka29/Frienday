@@ -18,6 +18,8 @@ struct AppUser: Identifiable, Hashable {
     var birthYear: Int
     var birthMonth: Int
     var birthDay: Int
+    var profileImageURL: String?
+    var imageColorHex: String
     var createdAt: Date?
     var updatedAt: Date?
 
@@ -36,6 +38,8 @@ struct AppUser: Identifiable, Hashable {
         birthYear: Int,
         birthMonth: Int,
         birthDay: Int,
+        profileImageURL: String? = nil,
+        imageColorHex: String = ProfileColor.blue.rawValue,
         createdAt: Date? = nil,
         updatedAt: Date? = nil
     ) {
@@ -45,6 +49,8 @@ struct AppUser: Identifiable, Hashable {
         self.birthYear = birthYear
         self.birthMonth = birthMonth
         self.birthDay = birthDay
+        self.profileImageURL = profileImageURL
+        self.imageColorHex = imageColorHex
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -64,6 +70,9 @@ struct AppUser: Identifiable, Hashable {
         self.birthYear = birthYear
         self.birthMonth = birthMonth
         self.birthDay = birthDay
+        let storedImageURL = data["profileImageURL"] as? String
+        profileImageURL = storedImageURL?.isEmpty == false ? storedImageURL : nil
+        imageColorHex = data["imageColorHex"] as? String ?? ProfileColor.blue.rawValue
         createdAt = (data["createdAt"] as? Timestamp)?.dateValue()
         updatedAt = (data["updatedAt"] as? Timestamp)?.dateValue()
     }
@@ -83,6 +92,8 @@ struct AppUser: Identifiable, Hashable {
             "birthYear": FieldValue.delete(),
             "birthMonth": birthMonth,
             "birthDay": birthDay,
+            "profileImageURL": profileImageURL ?? "",
+            "imageColorHex": imageColorHex,
             "createdAt": FieldValue.serverTimestamp(),
             "updatedAt": FieldValue.serverTimestamp()
         ]
@@ -104,6 +115,8 @@ struct AppUser: Identifiable, Hashable {
             "birthYear": FieldValue.delete(),
             "birthMonth": birthMonth,
             "birthDay": birthDay,
+            "profileImageURL": profileImageURL ?? "",
+            "imageColorHex": imageColorHex,
             "updatedAt": FieldValue.serverTimestamp()
         ]
     }

@@ -30,7 +30,6 @@ struct HomeView: View {
                     }
                 }
             }
-            .navigationTitle("ホーム")
             .toolbar {
                 Button {
                     Task { await load() }
@@ -142,7 +141,7 @@ private struct FeaturedBirthdayView: View {
             HStack {
                 Label("いちばん近い誕生日", systemImage: "gift.fill")
                     .font(.headline)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(memberColor)
                 Spacer()
                 Text(daysText)
                     .font(.headline)
@@ -150,36 +149,64 @@ private struct FeaturedBirthdayView: View {
 
             Spacer(minLength: 4)
 
-            Text(item.user.displayName)
-                .font(.system(size: 38, weight: .bold))
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
+            VStack(spacing: 12) {
+                ProfileAvatarView(user: item.user, size: 160)
 
-            Text("\(DateUtility.monthDayFormatter.string(from: item.nextBirthday))の誕生日")
-                .font(.title3)
-                .foregroundStyle(.secondary)
+                Text(item.user.displayName)
+                    .font(.system(size: 38, weight: .bold))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+
+            Text(birthdayDetailText)
+                .font(.title2.weight(.bold))
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
 
             Text(item.group.name)
                 .font(.subheadline)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background(Color.accentColor.opacity(0.12))
+                .background(memberColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
         }
         .padding(20)
-        .frame(maxWidth: .infinity, minHeight: 260, alignment: .leading)
-        .background(Color.accentColor.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .frame(maxWidth: .infinity, minHeight: 410, alignment: .leading)
+        .background(memberColor.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.accentColor.opacity(0.25), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(memberColor.opacity(0.25), lineWidth: 1)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("いちばん近い誕生日、\(item.user.displayName)さん、\(DateUtility.monthDayFormatter.string(from: item.nextBirthday))、\(daysText)、\(item.group.name)")
+        .accessibilityLabel("いちばん近い誕生日、\(item.user.displayName)さん、\(birthdayDetailText)、\(daysText)、\(item.group.name)")
     }
 
     private var daysText: String {
         item.daysUntilBirthday == 0 ? "今日" : "あと\(item.daysUntilBirthday)日"
+    }
+
+    private var birthdayDetailText: String {
+        let birthdayDate = DateUtility.monthDayFormatter.string(from: item.nextBirthday)
+
+        guard item.member.showBirthYear,
+              let birthYear = item.member.sharedBirthYear else {
+            return "\(birthdayDate)の誕生日"
+        }
+
+        let birthdayYear = Calendar.current.component(.year, from: item.nextBirthday)
+        let age = birthdayYear - birthYear
+        guard age >= 0 else {
+            return "\(birthdayDate)の誕生日"
+        }
+
+        return "\(birthdayDate)・\(age)歳の誕生日"
+    }
+
+    private var memberColor: Color {
+        Color(profileHex: item.user.imageColorHex)
     }
 }
 
@@ -189,6 +216,8 @@ private struct CompactBirthdayRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
+            ProfileAvatarView(user: item.user, size: 44)
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.user.displayName)
                     .font(.headline)

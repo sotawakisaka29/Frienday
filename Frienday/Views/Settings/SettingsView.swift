@@ -7,6 +7,8 @@
 
 import SwiftUI
 import FirebaseAuth
+import PhotosUI
+import UIKit
 
 /// プロフィール編集、通知、ログアウト、アカウント削除を行う設定画面です。
 struct SettingsView: View {
@@ -15,6 +17,8 @@ struct SettingsView: View {
     @State private var resetEmail = ""
     @State private var showsDeleteConfirmation = false
     @State private var birthdayItems: [BirthdayDisplayItem] = []
+    @State private var selectedProfileImage: PhotosPickerItem?
+    @State private var profileImageCropItem: ProfileImageCropItem?
 
     var body: some View {
         NavigationStack {
@@ -41,6 +45,22 @@ struct SettingsView: View {
             .task {
                 await load()
             }
+            .onChange(of: selectedProfileImage) { _, item in
+                guard let item else { return }
+                Task { await loadProfileImage(from: item) }
+            }
+            .sheet(item: $profileImageCropItem) { item in
+                ProfileImageCropView(
+                    image: item.image,
+                    onCancel: {
+                        profileImageCropItem = nil
+                    },
+                    onComplete: { croppedData in
+                        viewModel.setProfileImage(data: croppedData, contentType: "image/jpeg")
+                        profileImageCropItem = nil
+                    }
+                )
+            }
             .confirmationDialog("アカウントを削除しますか？", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
                 Button("削除", role: .destructive) {
                     Task { await deleteAccount() }
@@ -52,8 +72,40 @@ struct SettingsView: View {
 
     private var profileSection: some View {
         Section("プロフィール") {
+            VStack(spacing: 14) {
+                ProfileAvatarView(
+                    displayName: viewModel.profileDisplayName,
+                    imageURL: viewModel.profileImageURL,
+                    imageData: viewModel.pendingProfileImageData,
+                    colorHex: viewModel.profileImageColorHex,
+                    size: 104
+                )
+
+                HStack(spacing: 20) {
+                    PhotosPicker(selection: $selectedProfileImage, matching: .images) {
+                        Label("画像を選択", systemImage: "photo")
+                    }
+
+                    if viewModel.hasProfileImage {
+                        Button("削除", role: .destructive) {
+                            selectedProfileImage = nil
+                            viewModel.removeProfileImage()
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+
             TextField("表示名", text: profileDisplayNameBinding)
             BirthdayPicker(selection: profileBirthdayBinding)
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text("イメージカラー")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                ProfileColorPicker(selection: profileImageColorBinding)
+            }
+            .padding(.vertical, 4)
 
             if viewModel.hasProfileChanges {
                 Button {
@@ -157,6 +209,31 @@ struct SettingsView: View {
             viewModel.profileBirthday
         } set: { value in
             viewModel.setProfileBirthday(value)
+        }
+    }
+
+    private var profileImageColorBinding: Binding<String> {
+        Binding {
+            viewModel.profileImageColorHex
+        } set: { value in
+            viewModel.setProfileImageColor(value)
+        }
+    }
+
+    /// PhotosPickerから選択した画像を読み込み、切り取り画面を表示します。
+    private func loadProfileImage(from item: PhotosPickerItem) async {
+        defer { selectedProfileImage = nil }
+
+        do {
+            guard let data = try await item.loadTransferable(type: Data.self),
+                  let image = UIImage(data: data) else {
+                viewModel.showProfileImageLoadError()
+                return
+            }
+
+            profileImageCropItem = ProfileImageCropItem(image: image)
+        } catch {
+            viewModel.showProfileImageLoadError()
         }
     }
 
