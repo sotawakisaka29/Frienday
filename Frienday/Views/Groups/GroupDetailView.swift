@@ -82,10 +82,12 @@ struct GroupDetailView: View {
                     Label("グループから退会", systemImage: "rectangle.portrait.and.arrow.right")
                 }
 
-                Button(role: .destructive) {
-                    showsDeleteConfirmation = true
-                } label: {
-                    Label("グループを削除", systemImage: "trash")
+                if viewModel.isCurrentUserOwner {
+                    Button(role: .destructive) {
+                        showsDeleteConfirmation = true
+                    } label: {
+                        Label("グループを削除", systemImage: "trash")
+                    }
                 }
             }
         }

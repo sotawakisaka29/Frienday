@@ -16,6 +16,12 @@ enum ValidationUtility {
         return trimmed
     }
 
+    static func validateBio(_ value: String) throws -> String {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count <= 100 else { throw AppError.bioTooLong }
+        return trimmed
+    }
+
     static func validateEmail(_ value: String) throws -> String {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !trimmed.isEmpty else { throw AppError.invalidEmail }

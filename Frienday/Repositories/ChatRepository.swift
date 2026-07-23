@@ -49,6 +49,13 @@ struct ChatRepository {
         chatService.listenMessages(chatId: chatId, onChange: onChange)
     }
 
+    func listenLatestMessage(
+        chatId: String,
+        onChange: @escaping (ChatMessage?, Error?) -> Void
+    ) -> ChatListenerCancellation {
+        chatService.listenLatestMessage(chatId: chatId, onChange: onChange)
+    }
+
     func sendMessage(chatId: String, message: ChatMessage) async throws {
         try await chatService.sendMessage(chatId: chatId, message: message)
     }

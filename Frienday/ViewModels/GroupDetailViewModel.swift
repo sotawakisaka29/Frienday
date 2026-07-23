@@ -25,6 +25,10 @@ final class GroupDetailViewModel {
     private(set) var isUpdatingPrivacy = false
     private(set) var errorMessage: String?
 
+    var isCurrentUserOwner: Bool {
+        currentMember?.role == .owner
+    }
+
     init(
         group: BirthdayGroup,
         groupRepository: GroupRepository = GroupRepository(),
@@ -109,6 +113,11 @@ final class GroupDetailViewModel {
     }
 
     func delete(userId: String) async -> Bool {
+        guard isCurrentUserOwner, group.ownerId == userId else {
+            errorMessage = AppError.permissionDenied.message
+            return false
+        }
+
         do {
             try await groupRepository.deleteGroup(group: group, requesterId: userId)
             return true

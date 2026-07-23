@@ -45,7 +45,10 @@ struct ChatListView: View {
                     } else {
                         ForEach(viewModel.contacts) { contact in
                             NavigationLink(value: contact) {
-                                ChatContactRow(contact: contact)
+                                ChatContactRow(
+                                    contact: contact,
+                                    latestMessageText: viewModel.latestMessageText(for: contact)
+                                )
                             }
                         }
                     }
@@ -82,6 +85,7 @@ struct ChatListView: View {
 /// チャット相手のプロフィールとブロック状態を表示します。
 private struct ChatContactRow: View {
     let contact: ChatContact
+    let latestMessageText: String
 
     var body: some View {
         HStack(spacing: 12) {
@@ -96,9 +100,11 @@ private struct ChatContactRow: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                 } else {
-                    Text("個人チャット")
+                    Text(latestMessageText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
             }
         }

@@ -20,6 +20,7 @@ struct AppUser: Identifiable, Hashable {
     var birthDay: Int
     var profileImageURL: String?
     var imageColorHex: String
+    var bio: String
     var createdAt: Date?
     var updatedAt: Date?
 
@@ -40,6 +41,7 @@ struct AppUser: Identifiable, Hashable {
         birthDay: Int,
         profileImageURL: String? = nil,
         imageColorHex: String = ProfileColor.blue.rawValue,
+        bio: String = "",
         createdAt: Date? = nil,
         updatedAt: Date? = nil
     ) {
@@ -51,6 +53,7 @@ struct AppUser: Identifiable, Hashable {
         self.birthDay = birthDay
         self.profileImageURL = profileImageURL
         self.imageColorHex = imageColorHex
+        self.bio = bio
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -73,6 +76,7 @@ struct AppUser: Identifiable, Hashable {
         let storedImageURL = data["profileImageURL"] as? String
         profileImageURL = storedImageURL?.isEmpty == false ? storedImageURL : nil
         imageColorHex = data["imageColorHex"] as? String ?? ProfileColor.blue.rawValue
+        bio = data["bio"] as? String ?? ""
         createdAt = (data["createdAt"] as? Timestamp)?.dateValue()
         updatedAt = (data["updatedAt"] as? Timestamp)?.dateValue()
     }
@@ -94,6 +98,7 @@ struct AppUser: Identifiable, Hashable {
             "birthDay": birthDay,
             "profileImageURL": profileImageURL ?? "",
             "imageColorHex": imageColorHex,
+            "bio": bio,
             "createdAt": FieldValue.serverTimestamp(),
             "updatedAt": FieldValue.serverTimestamp()
         ]
@@ -117,6 +122,7 @@ struct AppUser: Identifiable, Hashable {
             "birthDay": birthDay,
             "profileImageURL": profileImageURL ?? "",
             "imageColorHex": imageColorHex,
+            "bio": bio,
             "updatedAt": FieldValue.serverTimestamp()
         ]
     }

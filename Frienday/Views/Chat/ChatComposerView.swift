@@ -19,7 +19,10 @@ struct ChatComposerView: View {
             HStack(alignment: .bottom, spacing: 10) {
                 TextField("メッセージ", text: $text, axis: .vertical)
                     .lineLimit(1...4)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(.plain)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color(uiColor: .secondarySystemBackground), in: Capsule())
                     .onChange(of: text) { _, newValue in
                         onTextChange(newValue)
                     }

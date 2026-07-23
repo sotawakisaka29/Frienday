@@ -19,6 +19,7 @@ final class SettingsViewModel {
 
     private(set) var profile: AppUser?
     var profileDisplayName = ""
+    var profileBio = ""
     var profileBirthday = Date()
     private(set) var profileImageURL: String?
     private(set) var pendingProfileImageData: Data?
@@ -60,6 +61,13 @@ final class SettingsViewModel {
     /// 表示名の入力を反映し、保存済みデータとの差を更新します。
     func setProfileDisplayName(_ displayName: String) {
         profileDisplayName = displayName
+        updateProfileChangeState()
+        clearFeedback()
+    }
+
+    /// 自己紹介を100文字以内に収めて、編集中のプロフィールへ反映します。
+    func setProfileBio(_ bio: String) {
+        profileBio = String(bio.prefix(100))
         updateProfileChangeState()
         clearFeedback()
     }
@@ -155,6 +163,7 @@ final class SettingsViewModel {
             let profile = try await userRepository.fetchProfile(userId: userId)
             self.profile = profile
             profileDisplayName = profile.displayName
+            profileBio = profile.bio
             profileImageURL = profile.profileImageURL
             pendingProfileImageData = nil
             profileImageColorHex = profile.imageColorHex
@@ -189,6 +198,7 @@ final class SettingsViewModel {
             }
 
             profile.displayName = try ValidationUtility.validateDisplayName(profileDisplayName)
+            profile.bio = try ValidationUtility.validateBio(profileBio)
             profile.birthYear = year
             profile.birthMonth = month
             profile.birthDay = day
@@ -213,6 +223,7 @@ final class SettingsViewModel {
 
             self.profile = profile
             profileDisplayName = profile.displayName
+            profileBio = profile.bio
             profileImageURL = profile.profileImageURL
             pendingProfileImageData = nil
             removesProfileImage = false
@@ -235,6 +246,7 @@ final class SettingsViewModel {
         }
 
         profileDisplayName = profile.displayName
+        profileBio = profile.bio
         profileImageURL = profile.profileImageURL
         pendingProfileImageData = nil
         profileImageColorHex = profile.imageColorHex
@@ -285,8 +297,10 @@ final class SettingsViewModel {
         }
 
         let normalizedName = profileDisplayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedBio = profileBio.trimmingCharacters(in: .whitespacesAndNewlines)
         let components = Calendar.current.dateComponents([.year, .month, .day], from: profileBirthday)
         hasProfileChanges = normalizedName != profile.displayName
+            || normalizedBio != profile.bio
             || components.year != profile.birthYear
             || components.month != profile.birthMonth
             || components.day != profile.birthDay

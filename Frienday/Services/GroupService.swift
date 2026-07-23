@@ -192,11 +192,12 @@ struct GroupService {
     }
 
     func deleteGroup(group: BirthdayGroup, requesterId: String) async throws {
-        guard group.ownerId == requesterId else {
+        let members = try await fetchMembers(groupId: group.groupId)
+        guard group.ownerId == requesterId,
+              members.first(where: { $0.userId == requesterId })?.role == .owner else {
             throw AppError.permissionDenied
         }
 
-        let members = try await fetchMembers(groupId: group.groupId)
         let batch = database.batch()
         let groupRef = database.collection("groups").document(group.groupId)
 

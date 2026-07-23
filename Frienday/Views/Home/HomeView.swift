@@ -223,10 +223,10 @@ private struct FeaturedBirthdayView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, minHeight: 410, alignment: .leading)
-        .background(memberColor.opacity(0.08))
+        .background(memberColor.opacity(0.20))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 16)
                 .stroke(memberColor.opacity(0.25), lineWidth: 1)
         }
         .accessibilityElement(children: .combine)

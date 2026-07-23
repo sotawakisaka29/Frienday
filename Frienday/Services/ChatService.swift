@@ -215,6 +215,38 @@ struct ChatService {
         }
     }
 
+    /// チャット一覧に表示する直近1件のメッセージをリアルタイムで受け取ります。
+    func listenLatestMessage(
+        chatId: String,
+        onChange: @escaping (ChatMessage?, Error?) -> Void
+    ) -> ChatListenerCancellation {
+        let listener = database
+            .collection("directChats")
+            .document(chatId)
+            .collection("messages")
+            .order(by: "createdAt", descending: true)
+            .limit(to: 1)
+            .addSnapshotListener(includeMetadataChanges: true) { snapshot, error in
+                guard let snapshot else {
+                    onChange(nil, error)
+                    return
+                }
+
+                let latestMessage = snapshot.documents.first.flatMap { document in
+                    ChatMessage(
+                        id: document.documentID,
+                        data: document.data(),
+                        hasPendingWrites: document.metadata.hasPendingWrites
+                    )
+                }
+                onChange(latestMessage, error)
+            }
+
+        return {
+            listener.remove()
+        }
+    }
+
     /// 50文字以内の文字メッセージを送信します。
     func sendMessage(chatId: String, message: ChatMessage) async throws {
         let text = try ValidationUtility.validateChatMessage(message.text)

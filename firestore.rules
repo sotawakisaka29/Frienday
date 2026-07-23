@@ -153,6 +153,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           "userId",
           "displayName",
+          "bio",
           "birthMonth",
           "birthDay",
           "profileImageURL",
@@ -161,6 +162,8 @@ service cloud.firestore {
           "updatedAt"
         ])
         && request.resource.data.userId == userId
+        && request.resource.data.bio is string
+        && request.resource.data.bio.size() <= 100
         && request.resource.data.profileImageURL is string
         && request.resource.data.profileImageURL.size() <= 2048
         && request.resource.data.imageColorHex is string
@@ -182,9 +185,21 @@ service cloud.firestore {
       match /members/{userId} {
         allow get: if isSelf(userId) || isGroupMember(groupId);
         allow list: if isGroupMember(groupId);
-        allow create: if signedIn() && (
-          userId == request.auth.uid || isGroupOwner(groupId)
-        ) && request.resource.data.role in ["owner", "member"];
+        allow create: if signedIn()
+          && request.resource.data.userId == userId
+          && (
+            (
+              request.resource.data.role == "member"
+              && (userId == request.auth.uid || isGroupOwner(groupId))
+            )
+            || (
+              request.resource.data.role == "owner"
+              && userId == request.auth.uid
+              && getAfter(
+                /databases/$(database)/documents/groups/$(groupId)
+              ).data.ownerId == request.auth.uid
+            )
+          );
         allow update: if isSelf(userId)
           && request.resource.data.role == resource.data.role;
         allow delete: if isSelf(userId) || isGroupOwner(groupId);

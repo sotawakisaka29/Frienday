@@ -169,7 +169,7 @@ struct DirectChatView: View {
     private var messageList: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: 10) {
+                LazyVStack(spacing: 10, pinnedViews: [.sectionHeaders]) {
                     if viewModel.isLoading {
                         ProgressView()
                             .padding()
@@ -181,9 +181,22 @@ struct DirectChatView: View {
                         )
                         .padding(.top, 60)
                     } else {
-                        ForEach(viewModel.messages) { message in
-                            messageRow(message)
-                                .id(message.messageId)
+                        ForEach(messageDaySections) { section in
+                            Section {
+                                ForEach(section.messages.indices, id: \.self) { index in
+                                    let message = section.messages[index]
+                                    messageRow(
+                                        message,
+                                        showsTime: shouldShowTime(
+                                            at: index,
+                                            in: section.messages
+                                        )
+                                    )
+                                    .id(message.messageId)
+                                }
+                            } header: {
+                                dateHeader(section.date)
+                            }
                         }
                     }
                 }
@@ -200,12 +213,54 @@ struct DirectChatView: View {
         }
     }
 
-    private func messageRow(_ message: ChatMessage) -> some View {
+    private var messageDaySections: [ChatMessageDaySection] {
+        let calendar = Calendar.autoupdatingCurrent
+        var sections: [ChatMessageDaySection] = []
+
+        for message in viewModel.messages {
+            let date = calendar.startOfDay(for: message.displayDate)
+            if let lastIndex = sections.indices.last,
+               calendar.isDate(sections[lastIndex].date, inSameDayAs: date) {
+                sections[lastIndex].messages.append(message)
+            } else {
+                sections.append(ChatMessageDaySection(date: date, messages: [message]))
+            }
+        }
+        return sections
+    }
+
+    private func shouldShowTime(at index: Int, in messages: [ChatMessage]) -> Bool {
+        guard messages.indices.contains(index + 1) else { return true }
+        return !Calendar.autoupdatingCurrent.isDate(
+            messages[index].displayDate,
+            equalTo: messages[index + 1].displayDate,
+            toGranularity: .minute
+        )
+    }
+
+    private func dateHeader(_ date: Date) -> some View {
+        HStack {
+            Spacer()
+            Text(date, format: .dateTime.month().day().weekday(.abbreviated))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 5)
+                .background(.thinMaterial, in: Capsule())
+            Spacer()
+        }
+        .padding(.vertical, 4)
+        .background(Color(uiColor: .systemBackground).opacity(0.96))
+    }
+
+    private func messageRow(_ message: ChatMessage, showsTime: Bool) -> some View {
         let isCurrentUser = message.senderId == authViewModel.currentUser?.uid
 
         return ChatMessageBubble(
             message: message,
             isCurrentUser: isCurrentUser,
+            otherUser: viewModel.contact.user,
+            showsTime: showsTime,
             onRetry: {
                 Task {
                     await viewModel.retry(message, isConnected: networkMonitor.isConnected)
@@ -256,6 +311,13 @@ struct DirectChatView: View {
             }
         }
     }
+}
+
+private struct ChatMessageDaySection: Identifiable {
+    let date: Date
+    var messages: [ChatMessage]
+
+    var id: Date { date }
 }
 
 #Preview {

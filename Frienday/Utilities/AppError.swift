@@ -13,6 +13,7 @@ import Foundation
 enum AppError: LocalizedError, Equatable {
     case invalidDisplayName
     case displayNameTooLong
+    case bioTooLong
     case invalidEmail
     case weakPassword
     case passwordMismatch
@@ -63,6 +64,7 @@ enum AppError: LocalizedError, Equatable {
         switch self {
         case .invalidDisplayName: return "表示名を入力してください。"
         case .displayNameTooLong: return "表示名は30文字以内で入力してください。"
+        case .bioTooLong: return "自己紹介は100文字以内で入力してください。"
         case .invalidEmail: return "メールアドレスの形式が正しくありません。"
         case .weakPassword: return "パスワードは6文字以上で入力してください。"
         case .passwordMismatch: return "確認用パスワードが一致していません。"

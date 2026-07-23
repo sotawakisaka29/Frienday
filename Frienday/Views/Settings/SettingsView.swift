@@ -19,6 +19,7 @@ struct SettingsView: View {
     @State private var birthdayItems: [BirthdayDisplayItem] = []
     @State private var selectedProfileImage: PhotosPickerItem?
     @State private var profileImageCropItem: ProfileImageCropItem?
+    @State private var isEditingProfile = false
 
     init(viewModel: SettingsViewModel) {
         self.viewModel = viewModel
@@ -49,6 +50,11 @@ struct SettingsView: View {
             .task {
                 await load()
             }
+            .onDisappear {
+                if !viewModel.hasProfileChanges {
+                    isEditingProfile = false
+                }
+            }
             .onChange(of: selectedProfileImage) { _, item in
                 guard let item else { return }
                 Task { await loadProfileImage(from: item) }
@@ -75,7 +81,7 @@ struct SettingsView: View {
     }
 
     private var profileSection: some View {
-        Section("プロフィール") {
+        Section {
             VStack(spacing: 14) {
                 ProfileAvatarView(
                     displayName: viewModel.profileDisplayName,
@@ -85,43 +91,116 @@ struct SettingsView: View {
                     size: 104
                 )
 
-                HStack(spacing: 20) {
-                    PhotosPicker(selection: $selectedProfileImage, matching: .images) {
-                        Label("画像を選択", systemImage: "photo")
-                    }
+                if isEditingProfile {
+                    HStack(spacing: 20) {
+                        PhotosPicker(selection: $selectedProfileImage, matching: .images) {
+                            Label("画像を選択", systemImage: "photo")
+                        }
 
-                    if viewModel.hasProfileImage {
-                        Button("削除", role: .destructive) {
-                            selectedProfileImage = nil
-                            viewModel.removeProfileImage()
+                        if viewModel.hasProfileImage {
+                            Button("削除", role: .destructive) {
+                                selectedProfileImage = nil
+                                viewModel.removeProfileImage()
+                            }
                         }
                     }
                 }
             }
             .frame(maxWidth: .infinity)
 
-            TextField("表示名", text: profileDisplayNameBinding)
-            BirthdayPicker(selection: profileBirthdayBinding)
+            if isEditingProfile {
+                TextField("表示名", text: profileDisplayNameBinding)
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text("イメージカラー")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                ProfileColorPicker(selection: profileImageColorBinding)
-            }
-            .padding(.vertical, 4)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("自己紹介")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
 
-            if viewModel.hasProfileChanges {
-                Button {
-                    Task { await viewModel.updateProfile() }
-                } label: {
-                    if viewModel.isSavingProfile {
-                        ProgressView()
-                    } else {
-                        Label("保存", systemImage: "checkmark.circle")
+                    ZStack(alignment: .topLeading) {
+                        if viewModel.profileBio.isEmpty {
+                            Text("自己紹介を入力")
+                                .foregroundStyle(.tertiary)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 8)
+                        }
+
+                        TextEditor(text: profileBioBinding)
+                            .scrollContentBackground(.hidden)
+                            .frame(minHeight: 100)
                     }
+
+                    Text("\(viewModel.profileBio.count)/100")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                .disabled(viewModel.isSavingProfile)
+
+                BirthdayPicker(selection: profileBirthdayBinding)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("イメージカラー")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    ProfileColorPicker(selection: profileImageColorBinding)
+                }
+                .padding(.vertical, 4)
+
+                HStack {
+                    Button("キャンセル", role: .cancel) {
+                        cancelProfileEditing()
+                    }
+                    .disabled(viewModel.isSavingProfile)
+
+                    Spacer()
+
+                    Button {
+                        Task { await saveProfile() }
+                    } label: {
+                        if viewModel.isSavingProfile {
+                            ProgressView()
+                        } else {
+                            Label("保存", systemImage: "checkmark.circle")
+                        }
+                    }
+                    .disabled(viewModel.isSavingProfile)
+                }
+            } else {
+                LabeledContent("表示名", value: viewModel.profileDisplayName)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("自己紹介")
+                        .foregroundStyle(.secondary)
+                    Text(viewModel.profileBio.isEmpty ? "未設定" : viewModel.profileBio)
+                        .foregroundStyle(viewModel.profileBio.isEmpty ? .secondary : .primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                LabeledContent("誕生日") {
+                    Text(DateUtility.fullDateFormatter.string(from: viewModel.profileBirthday))
+                }
+
+                LabeledContent("イメージカラー") {
+                    Circle()
+                        .fill(Color(profileHex: viewModel.profileImageColorHex))
+                        .frame(width: 24, height: 24)
+                        .overlay {
+                            Circle()
+                                .stroke(Color.secondary.opacity(0.25), lineWidth: 1)
+                        }
+                        .accessibilityLabel("選択中のイメージカラー")
+                }
+            }
+        } header: {
+            HStack {
+                Text("プロフィール")
+                Spacer()
+                if !isEditingProfile {
+                    Button("編集") {
+                        viewModel.clearFeedback()
+                        isEditingProfile = true
+                    }
+                    .disabled(viewModel.profile == nil || viewModel.isLoading)
+                }
             }
         }
     }
@@ -210,6 +289,14 @@ struct SettingsView: View {
         }
     }
 
+    private var profileBioBinding: Binding<String> {
+        Binding {
+            viewModel.profileBio
+        } set: { value in
+            viewModel.setProfileBio(value)
+        }
+    }
+
     private var profileBirthdayBinding: Binding<Date> {
         Binding {
             viewModel.profileBirthday
@@ -252,6 +339,25 @@ struct SettingsView: View {
 
         let homeViewModel = HomeViewModel()
         birthdayItems = (try? await homeViewModel.loadBirthdayItems(userId: userId)) ?? []
+    }
+
+    private func cancelProfileEditing() {
+        selectedProfileImage = nil
+        profileImageCropItem = nil
+        viewModel.discardProfileChanges()
+        isEditingProfile = false
+    }
+
+    private func saveProfile() async {
+        guard viewModel.hasProfileChanges else {
+            isEditingProfile = false
+            return
+        }
+
+        await viewModel.updateProfile()
+        if !viewModel.hasProfileChanges && viewModel.errorMessage == nil {
+            isEditingProfile = false
+        }
     }
 
     private func deleteAccount() async {

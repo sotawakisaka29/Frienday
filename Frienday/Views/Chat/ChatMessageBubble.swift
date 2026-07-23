@@ -11,12 +11,18 @@ import SwiftUI
 struct ChatMessageBubble: View {
     let message: ChatMessage
     let isCurrentUser: Bool
+    let otherUser: AppUser
+    let showsTime: Bool
     let onRetry: () -> Void
 
     var body: some View {
-        HStack {
+        HStack(alignment: .top, spacing: 8) {
             if isCurrentUser {
                 Spacer(minLength: 52)
+            } else {
+                ProfileAvatarView(user: otherUser, size: 34)
+                    .padding(.top, 2)
+                    .accessibilityHidden(true)
             }
 
             VStack(alignment: isCurrentUser ? .trailing : .leading, spacing: 5) {
@@ -27,12 +33,16 @@ struct ChatMessageBubble: View {
                     .background(isCurrentUser ? Color.accentColor : Color.secondary.opacity(0.15))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
 
-                HStack(spacing: 5) {
-                    Text(message.displayDate, format: .dateTime.month().day().hour().minute())
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                if showsTime || showsDeliveryStatus {
+                    HStack(spacing: 5) {
+                        if showsTime {
+                            Text(message.displayDate, format: .dateTime.hour().minute())
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
 
-                    deliveryStatus
+                        deliveryStatus
+                    }
                 }
             }
 
@@ -41,6 +51,10 @@ struct ChatMessageBubble: View {
             }
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private var showsDeliveryStatus: Bool {
+        isCurrentUser && message.deliveryState != .sent
     }
 
     @ViewBuilder
@@ -74,6 +88,15 @@ struct ChatMessageBubble: View {
 }
 
 #Preview {
+    let friend = AppUser(
+        userId: "friend",
+        displayName: "友達",
+        email: "",
+        birthYear: 2000,
+        birthMonth: 1,
+        birthDay: 1
+    )
+
     VStack {
         ChatMessageBubble(
             message: ChatMessage(
@@ -83,6 +106,8 @@ struct ChatMessageBubble: View {
                 deliveryState: .sent
             ),
             isCurrentUser: true,
+            otherUser: friend,
+            showsTime: true,
             onRetry: {}
         )
 
@@ -94,6 +119,8 @@ struct ChatMessageBubble: View {
                 deliveryState: .sent
             ),
             isCurrentUser: false,
+            otherUser: friend,
+            showsTime: true,
             onRetry: {}
         )
     }
