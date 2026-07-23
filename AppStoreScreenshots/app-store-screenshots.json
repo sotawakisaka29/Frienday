@@ -24,16 +24,16 @@
         "screenshot": "/screenshots/apple/iphone/ja/01.png",
         "transforms": {
           "device": {
-            "x": 145.98224783861667,
-            "y": 747.9840000000002,
+            "x": 150.78224783861668,
+            "y": 812.7839999999995,
             "width": 1013.6355043227666,
             "height": 2064.96,
             "rotation": 0,
             "zIndex": 1
           },
           "caption": {
-            "x": 112.80000284830732,
-            "y": 188.5199919230142,
+            "x": 103.20000284830729,
+            "y": 121.31999192301404,
             "width": 1111,
             "height": 412,
             "rotation": 0,
@@ -47,10 +47,10 @@
               "ja": "誕生日を\n忘れない"
             },
             "transform": {
-              "x": 251.99999999999955,
-              "y": 302.559969482422,
+              "x": 240.0000035603838,
+              "y": 263.7599611206059,
               "width": 845,
-              "height": 346,
+              "height": 370,
               "rotation": 0,
               "zIndex": 6
             },
@@ -58,7 +58,8 @@
             "fontWeight": 800,
             "align": "center"
           }
-        ]
+        ],
+        "labelFontSize": 50
       },
       {
         "id": "frienday-groups",
@@ -70,28 +71,57 @@
           "ja": "グループで\n広がる\nお祝い"
         },
         "screenshot": "/screenshots/apple/iphone/ja/02.png",
-        "headlineFontSize": 148,
+        "headlineFontSize": 154,
         "transforms": {
           "caption": {
-            "x": 105.60000000000001,
-            "y": 229.44,
+            "x": 105.59999999999991,
+            "y": 114.23999999999975,
             "width": 1108.8,
             "height": 803.0400000000001,
             "rotation": 0,
             "zIndex": 4
+          },
+          "device": {
+            "x": 155.5822478386167,
+            "y": 803.2799999999994,
+            "width": 1013.6355043227666,
+            "height": 2064.96,
+            "rotation": 0,
+            "zIndex": 3
           }
-        }
+        },
+        "labelFontSize": 53
       },
       {
         "id": "frienday-calendar",
-        "layout": "device-top",
+        "layout": "device-bottom",
         "label": {
           "ja": "予定をひと目で"
         },
         "headline": {
           "ja": "誕生日が\n一目でわかる"
         },
-        "screenshot": "/screenshots/apple/iphone/ja/03.png"
+        "screenshot": "/screenshots/apple/iphone/ja/03.png",
+        "labelFontSize": 51,
+        "headlineFontSize": 172,
+        "transforms": {
+          "device": {
+            "x": 153.1822478386166,
+            "y": 776.8799999999997,
+            "width": 1013.6355043227666,
+            "height": 2064.96,
+            "rotation": 0,
+            "zIndex": 3
+          },
+          "caption": {
+            "x": 112.80000000000018,
+            "y": 155.03999999999996,
+            "width": 1108.8,
+            "height": 803.04,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
       },
       {
         "id": "frienday-chat",
@@ -102,18 +132,42 @@
         "headline": {
           "ja": "おめでとうを\nすぐ届けよう"
         },
-        "screenshot": "/screenshots/apple/iphone/ja/04.png"
+        "screenshot": "/screenshots/apple/iphone/ja/04.png",
+        "labelFontSize": 51,
+        "headlineFontSize": 166,
+        "transforms": {
+          "caption": {
+            "x": 112.80000000000018,
+            "y": 150.23999999999984,
+            "width": 1108.8,
+            "height": 803.04,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
       },
       {
         "id": "frienday-profile",
-        "layout": "device-top",
+        "layout": "device-bottom",
         "label": {
           "ja": "あなたらしく"
         },
         "headline": {
           "ja": "伝えよう\n今の自分"
         },
-        "screenshot": "/screenshots/apple/iphone/ja/05.png"
+        "screenshot": "/screenshots/apple/iphone/ja/05.png",
+        "labelFontSize": 49,
+        "headlineFontSize": 176,
+        "transforms": {
+          "caption": {
+            "x": 117.60000284830494,
+            "y": 150.24000823974592,
+            "width": 1107,
+            "height": 803,
+            "rotation": 0,
+            "zIndex": 4
+          }
+        }
       },
       {
         "id": "frienday-notification",
@@ -122,9 +176,29 @@
           "ja": "当日を逃さない"
         },
         "headline": {
-          "ja": "通知で誕生日を\n忘れない"
+          "ja": "通知で誕生日\nを忘れない"
         },
-        "screenshot": "/screenshots/apple/iphone/ja/06.png"
+        "screenshot": "/screenshots/apple/iphone/ja/06.png",
+        "labelFontSize": 51,
+        "headlineFontSize": 174,
+        "transforms": {
+          "caption": {
+            "x": 122.39999999999782,
+            "y": 2080.200000000002,
+            "width": 1108.8,
+            "height": 803.0400000000001,
+            "rotation": 0,
+            "zIndex": 4
+          },
+          "device": {
+            "x": 150.78224783861697,
+            "y": -145.19999999999982,
+            "width": 1013.6355043227666,
+            "height": 2064.96,
+            "rotation": 0,
+            "zIndex": 3
+          }
+        }
       }
     ],
     "android": [],

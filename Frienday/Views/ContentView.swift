@@ -9,10 +9,19 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var authViewModel = AuthViewModel()
+    @AppStorage("hasConfirmedMinimumAge") private var hasConfirmedMinimumAge = false
 
     var body: some View {
-        RootView()
-            .environment(authViewModel)
+        Group {
+            if hasConfirmedMinimumAge {
+                RootView()
+                    .environment(authViewModel)
+            } else {
+                AgeConfirmationView {
+                    hasConfirmedMinimumAge = true
+                }
+            }
+        }
     }
 }
 
