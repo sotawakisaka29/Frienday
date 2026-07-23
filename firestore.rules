@@ -10,6 +10,10 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
     function isGroupMember(groupId) {
       return signedIn()
         && exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
@@ -20,11 +24,124 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.role == "owner";
     }
 
+    function hasParticipantShape(data) {
+      return signedIn()
+        && data.participantIds is list
+        && data.participantIds.size() == 2
+        && data.participantIds[0] != data.participantIds[1]
+        && request.auth.uid in data.participantIds;
+    }
+
+    function otherParticipant(data) {
+      return data.participantIds[0] == request.auth.uid
+        ? data.participantIds[1]
+        : data.participantIds[0];
+    }
+
+    function activeGroupId(data) {
+      return get(
+        /databases/$(database)/documents/users/$(request.auth.uid)/connections/$(otherParticipant(data))
+      ).data.activeGroupId;
+    }
+
+    function hasActiveConnection(data) {
+      return hasParticipantShape(data)
+        && exists(
+          /databases/$(database)/documents/users/$(request.auth.uid)/connections/$(otherParticipant(data))
+        )
+        && get(
+          /databases/$(database)/documents/users/$(request.auth.uid)/connections/$(otherParticipant(data))
+        ).data.userId == request.auth.uid
+        && get(
+          /databases/$(database)/documents/users/$(request.auth.uid)/connections/$(otherParticipant(data))
+        ).data.otherUserId == otherParticipant(data)
+        && exists(
+          /databases/$(database)/documents/groups/$(activeGroupId(data))/members/$(request.auth.uid)
+        )
+        && exists(
+          /databases/$(database)/documents/groups/$(activeGroupId(data))/members/$(otherParticipant(data))
+        );
+    }
+
+    function neitherParticipantBlocked(data) {
+      return !exists(
+          /databases/$(database)/documents/users/$(request.auth.uid)/blockedUsers/$(otherParticipant(data))
+        )
+        && !exists(
+          /databases/$(database)/documents/users/$(otherParticipant(data))/blockedUsers/$(request.auth.uid)
+        );
+    }
+
+    function activeChat(chatId) {
+      return exists(/databases/$(database)/documents/directChats/$(chatId))
+        && hasActiveConnection(
+          get(/databases/$(database)/documents/directChats/$(chatId)).data
+        );
+    }
+
     match /users/{userId} {
       allow read, create, update, delete: if isSelf(userId);
 
       match /groups/{groupId} {
         allow read, create, update, delete: if isSelf(userId);
+      }
+
+      match /connections/{otherUserId} {
+        allow read: if isSelf(userId);
+        allow create, update: if signedIn()
+          && (request.auth.uid == userId || request.auth.uid == otherUserId)
+          && userId != otherUserId
+          && request.resource.data.keys().hasOnly([
+            "userId",
+            "otherUserId",
+            "activeGroupId",
+            "updatedAt"
+          ])
+          && request.resource.data.userId == userId
+          && request.resource.data.otherUserId == otherUserId
+          && request.resource.data.activeGroupId is string
+          && request.resource.data.updatedAt == request.time
+          && exists(
+            /databases/$(database)/documents/groups/$(request.resource.data.activeGroupId)/members/$(userId)
+          )
+          && exists(
+            /databases/$(database)/documents/groups/$(request.resource.data.activeGroupId)/members/$(otherUserId)
+          );
+        allow delete: if signedIn()
+          && (request.auth.uid == userId || request.auth.uid == otherUserId);
+      }
+
+      match /blockedUsers/{blockedUserId} {
+        allow read: if isSelf(userId);
+        allow create: if isSelf(userId)
+          && userId != blockedUserId
+          && request.resource.data.keys().hasOnly([
+            "blockerId",
+            "blockedUserId",
+            "createdAt"
+          ])
+          && request.resource.data.blockerId == userId
+          && request.resource.data.blockedUserId == blockedUserId
+          && request.resource.data.createdAt == request.time;
+        allow update: if false;
+        allow delete: if isSelf(userId);
+      }
+
+      match /devices/{deviceId} {
+        allow read, delete: if isSelf(userId);
+        allow create, update: if isSelf(userId)
+          && request.resource.data.keys().hasOnly([
+            "userId",
+            "token",
+            "platform",
+            "updatedAt"
+          ])
+          && request.resource.data.userId == userId
+          && request.resource.data.token is string
+          && request.resource.data.token.size() > 0
+          && request.resource.data.token.size() <= 4096
+          && request.resource.data.platform == "ios"
+          && request.resource.data.updatedAt == request.time;
       }
     }
 
@@ -85,6 +202,96 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if signedIn()
         && get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.ownerId == request.auth.uid;
+    }
+
+    match /directChats/{chatId} {
+      allow get: if hasActiveConnection(resource.data);
+      allow list: if false;
+      allow create: if hasActiveConnection(request.resource.data)
+        && request.resource.data.keys().hasOnly([
+          "participantIds",
+          "createdAt"
+        ])
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if activeChat(chatId);
+        allow create: if activeChat(chatId)
+          && neitherParticipantBlocked(
+            get(/databases/$(database)/documents/directChats/$(chatId)).data
+          )
+          && request.resource.data.keys().hasOnly([
+            "senderId",
+            "text",
+            "createdAt",
+            "clientCreatedAt"
+          ])
+          && request.resource.data.senderId == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 50
+          && request.resource.data.text.matches('.*\\S.*')
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.clientCreatedAt is timestamp;
+        allow update: if activeChat(chatId)
+          && neitherParticipantBlocked(
+            get(/databases/$(database)/documents/directChats/$(chatId)).data
+          )
+          && resource.data.senderId == request.auth.uid
+          && request.resource.data.keys().hasOnly([
+            "senderId",
+            "text",
+            "createdAt",
+            "clientCreatedAt"
+          ])
+          && request.resource.data.senderId == resource.data.senderId
+          && request.resource.data.text == resource.data.text
+          && request.resource.data.clientCreatedAt == resource.data.clientCreatedAt
+          && request.resource.data.createdAt == request.time;
+        allow delete: if activeChat(chatId)
+          && resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    match /reports/{reportId} {
+      allow create: if signedIn()
+        && activeChat(request.resource.data.chatId)
+        && request.resource.data.keys().hasOnly([
+          "chatId",
+          "messageId",
+          "reporterId",
+          "reportedUserId",
+          "reason",
+          "messageText",
+          "messageSentAt",
+          "createdAt",
+          "status"
+        ])
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.reportedUserId != request.auth.uid
+        && request.resource.data.reason in [
+          "harassment",
+          "spam",
+          "personalInformation",
+          "other"
+        ]
+        && request.resource.data.status == "open"
+        && request.resource.data.createdAt == request.time
+        && exists(
+          /databases/$(database)/documents/directChats/$(request.resource.data.chatId)/messages/$(request.resource.data.messageId)
+        )
+        && get(
+          /databases/$(database)/documents/directChats/$(request.resource.data.chatId)/messages/$(request.resource.data.messageId)
+        ).data.senderId == request.resource.data.reportedUserId
+        && get(
+          /databases/$(database)/documents/directChats/$(request.resource.data.chatId)/messages/$(request.resource.data.messageId)
+        ).data.text == request.resource.data.messageText
+        && get(
+          /databases/$(database)/documents/directChats/$(request.resource.data.chatId)/messages/$(request.resource.data.messageId)
+        ).data.createdAt == request.resource.data.messageSentAt;
+      allow read, update: if isAdmin();
+      allow delete: if false;
     }
   }
 }

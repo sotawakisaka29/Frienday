@@ -13,12 +13,16 @@ import UIKit
 /// プロフィール編集、通知、ログアウト、アカウント削除を行う設定画面です。
 struct SettingsView: View {
     @Environment(AuthViewModel.self) private var authViewModel
-    @State private var viewModel = SettingsViewModel()
+    @Bindable var viewModel: SettingsViewModel
     @State private var resetEmail = ""
     @State private var showsDeleteConfirmation = false
     @State private var birthdayItems: [BirthdayDisplayItem] = []
     @State private var selectedProfileImage: PhotosPickerItem?
     @State private var profileImageCropItem: ProfileImageCropItem?
+
+    init(viewModel: SettingsViewModel) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         NavigationStack {
@@ -167,11 +171,13 @@ struct SettingsView: View {
             }
 
             Button(role: .destructive) {
-                do {
-                    viewModel.clearNotifications()
-                    try authViewModel.signOut()
-                } catch {
-                    return
+                Task {
+                    do {
+                        viewModel.clearNotifications()
+                        try await authViewModel.signOut()
+                    } catch {
+                        return
+                    }
                 }
             } label: {
                 Label("ログアウト", systemImage: "rectangle.portrait.and.arrow.right")
@@ -255,6 +261,6 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
+    SettingsView(viewModel: SettingsViewModel())
         .environment(AuthViewModel())
 }

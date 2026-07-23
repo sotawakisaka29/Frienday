@@ -1,0 +1,32 @@
+[debug] [2026-07-23T04:38:57.982Z] ----------------------------------------------------------------------
+[debug] [2026-07-23T04:38:57.984Z] Command:       /usr/local/Cellar/node/26.3.0/bin/node /Users/wakisakasota/.npm/_npx/ba4f1959e38407b5/node_modules/.bin/firebase functions:list --project frienday-75069 --debug
+[debug] [2026-07-23T04:38:57.985Z] CLI Version:   15.24.0
+[debug] [2026-07-23T04:38:57.985Z] Platform:      darwin
+[debug] [2026-07-23T04:38:57.986Z] Node Version:  v26.3.0
+[debug] [2026-07-23T04:38:57.987Z] Detected Agent: codex_cli
+[debug] [2026-07-23T04:38:57.987Z] Time:          Thu Jul 23 2026 13:38:57 GMT+0900 (Japan Standard Time)
+[debug] [2026-07-23T04:38:57.988Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-23T04:38:58.167Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-23T04:38:58.170Z] > authorizing via signed-in user (wksk2005sut0829@gmail.com)
+[debug] [2026-07-23T04:38:58.170Z] [iam] checking project frienday-75069 for permissions ["cloudfunctions.functions.list","firebase.projects.get","run.services.list"]
+[debug] [2026-07-23T04:38:58.185Z] Checked if tokens are valid: true, expires at: 1784785032760
+[debug] [2026-07-23T04:38:58.185Z] Checked if tokens are valid: true, expires at: 1784785032760
+[debug] [2026-07-23T04:38:58.186Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/frienday-75069:testIamPermissions [none]
+[debug] [2026-07-23T04:38:58.186Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/frienday-75069:testIamPermissions  x-goog-user-project=frienday-75069
+[debug] [2026-07-23T04:38:58.187Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/frienday-75069:testIamPermissions {"permissions":["cloudfunctions.functions.list","firebase.projects.get","run.services.list"]}
+[debug] [2026-07-23T04:38:58.942Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/frienday-75069:testIamPermissions 200
+[debug] [2026-07-23T04:38:58.943Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/frienday-75069:testIamPermissions {"permissions":["cloudfunctions.functions.list","firebase.projects.get","run.services.list"]}
+[debug] [2026-07-23T04:38:58.944Z] Checked if tokens are valid: true, expires at: 1784785032760
+[debug] [2026-07-23T04:38:58.945Z] Checked if tokens are valid: true, expires at: 1784785032760
+[debug] [2026-07-23T04:38:58.946Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/frienday-75069/locations/-/functions [none]
+[debug] [2026-07-23T04:38:59.287Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/frienday-75069/locations/-/functions 403
+[debug] [2026-07-23T04:38:59.288Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/frienday-75069/locations/-/functions {"error":{"code":403,"message":"Cloud Functions API has not been used in project frienday-75069 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=frienday-75069 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"serviceTitle":"Cloud Functions API","service":"cloudfunctions.googleapis.com","consumer":"projects/frienday-75069","containerInfo":"frienday-75069","activationUrl":"https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=frienday-75069"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Cloud Functions API has not been used in project frienday-75069 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=frienday-75069 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=frienday-75069"}]}]}}
+[debug] [2026-07-23T04:38:59.291Z] [functions] failed to list functions for frienday-75069
+[debug] [2026-07-23T04:38:59.291Z] [functions] Request to https://cloudfunctions.googleapis.com/v1/projects/frienday-75069/locations/-/functions had HTTP Error: 403, Cloud Functions API has not been used in project frienday-75069 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=frienday-75069 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+[debug] [2026-07-23T04:38:59.293Z] FirebaseError: Request to https://cloudfunctions.googleapis.com/v1/projects/frienday-75069/locations/-/functions had HTTP Error: 403, Cloud Functions API has not been used in project frienday-75069 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=frienday-75069 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+    at responseToError (/Users/wakisakasota/.npm/_npx/ba4f1959e38407b5/node_modules/firebase-tools/lib/responseToError.js:53:12)
+    at RetryOperation._fn (/Users/wakisakasota/.npm/_npx/ba4f1959e38407b5/node_modules/firebase-tools/lib/apiv2.js:415:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[error] 
+[error] Error: Failed to list functions for frienday-75069

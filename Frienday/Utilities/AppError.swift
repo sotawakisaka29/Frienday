@@ -45,6 +45,14 @@ enum AppError: LocalizedError, Equatable {
     case notificationPermissionDenied
     case requiresRecentLogin
     case ownerCannotLeaveWithMembers
+    case emptyChatMessage
+    case chatMessageTooLong
+    case chatUnavailable
+    case chatBlocked
+    case chatSendFailed
+    case chatDeleteFailed
+    case chatReportFailed
+    case pushNotificationsNotConfigured
     case unknown
 
     var errorDescription: String? {
@@ -87,6 +95,14 @@ enum AppError: LocalizedError, Equatable {
         case .notificationPermissionDenied: return "通知が許可されていません。設定アプリから通知を許可してください。"
         case .requiresRecentLogin: return "安全のため、もう一度ログインしてから操作してください。"
         case .ownerCannotLeaveWithMembers: return "ownerは他のメンバーがいる間は退会できません。先にグループを削除してください。"
+        case .emptyChatMessage: return "メッセージを入力してください。"
+        case .chatMessageTooLong: return "メッセージは50文字以内で入力してください。"
+        case .chatUnavailable: return "共通のグループに所属していないため、現在この相手とはチャットできません。"
+        case .chatBlocked: return "ブロック中のため、メッセージを送信できません。"
+        case .chatSendFailed: return "メッセージを送信できませんでした。通信環境を確認して再送してください。"
+        case .chatDeleteFailed: return "メッセージを削除できませんでした。"
+        case .chatReportFailed: return "通報を送信できませんでした。"
+        case .pushNotificationsNotConfigured: return "プッシュ通知の設定が不足しています。FirebaseMessagingとPush Notificationsの設定を確認してください。"
         case .unknown: return "処理に失敗しました。時間をおいて再度お試しください。"
         }
     }

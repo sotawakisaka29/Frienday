@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0689AF6D30112ACD00151B9A /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 0689AF6C30112ACD00151B9A /* FirebaseStorage */; };
+		0689AF923011CCB200151B9A /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 0689AF913011CCB200151B9A /* FirebaseMessaging */; };
 		06E587633010BA170037D842 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587623010BA170037D842 /* FirebaseAuth */; };
 		06E587653010BA170037D842 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587643010BA170037D842 /* FirebaseCore */; };
 		06E587673010BA170037D842 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 06E587663010BA170037D842 /* FirebaseFirestore */; };
@@ -44,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0689AF923011CCB200151B9A /* FirebaseMessaging in Frameworks */,
 				06E587653010BA170037D842 /* FirebaseCore in Frameworks */,
 				06E587633010BA170037D842 /* FirebaseAuth in Frameworks */,
 				06E587673010BA170037D842 /* FirebaseFirestore in Frameworks */,
@@ -104,6 +106,7 @@
 				06E587663010BA170037D842 /* FirebaseFirestore */,
 				06E587683010C0010037D842 /* GoogleSignIn */,
 				0689AF6C30112ACD00151B9A /* FirebaseStorage */,
+				0689AF913011CCB200151B9A /* FirebaseMessaging */,
 			);
 			productName = Frienday;
 			productReference = 06E5874D3010B3280037D842 /* Frienday.app */;
@@ -125,11 +128,18 @@
 				};
 			};
 			buildConfigurationList = 06E587483010B3280037D842 /* Build configuration list for PBXProject "Frienday" */;
-			developmentRegion = en;
+			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ja,
+				"zh-HK",
+				"zh-Hant",
+				"zh-Hans",
+				fr,
+				it,
+				ko,
 			);
 			mainGroup = 06E587443010B3280037D842;
 			minimizedProjectReferenceProxies = 1;
@@ -294,6 +304,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Frienday/Frienday.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DTM7CUJQWQ;
@@ -322,6 +333,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Frienday/Frienday.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DTM7CUJQWQ;
@@ -392,6 +404,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 06E587613010BA170037D842 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		0689AF913011CCB200151B9A /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06E587613010BA170037D842 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 		06E587623010BA170037D842 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;

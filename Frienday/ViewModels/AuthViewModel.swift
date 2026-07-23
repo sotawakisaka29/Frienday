@@ -14,14 +14,27 @@ import UIKit
 @MainActor
 final class AuthViewModel {
     private let authService: AuthServiceProtocol
+    private let pushNotificationService: PushNotificationService
     private var authStateHandle: AuthStateDidChangeListenerHandle?
 
     private(set) var currentUser: User?
     private(set) var errorMessage: String?
     private(set) var isCheckingSession = true
 
-    init(authService: AuthServiceProtocol = AuthService()) {
+    init() {
+        let authService = AuthService()
         self.authService = authService
+        pushNotificationService = .shared
+        currentUser = authService.currentUser
+        startAuthStateListener()
+    }
+
+    init(
+        authService: AuthServiceProtocol,
+        pushNotificationService: PushNotificationService
+    ) {
+        self.authService = authService
+        self.pushNotificationService = pushNotificationService
         currentUser = authService.currentUser
         startAuthStateListener()
     }
@@ -69,8 +82,11 @@ final class AuthViewModel {
         }
     }
 
-    func signOut() throws {
+    func signOut() async throws {
         do {
+            if let userId = currentUser?.uid {
+                await pushNotificationService.unregisterCurrentDevice(userId: userId)
+            }
             try authService.signOut()
             currentUser = nil
             errorMessage = nil
@@ -94,6 +110,9 @@ final class AuthViewModel {
 
     func deleteAuthAccount() async throws {
         do {
+            if let userId = currentUser?.uid {
+                await pushNotificationService.unregisterCurrentDevice(userId: userId)
+            }
             try await authService.deleteAccount()
             currentUser = nil
             errorMessage = nil

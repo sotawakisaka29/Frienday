@@ -11,6 +11,8 @@ import GoogleSignIn
 
 @main
 struct FriendayApp: App {
+    @UIApplicationDelegateAdaptor(FriendayAppDelegate.self) private var appDelegate
+
     init() {
         FirebaseManager.shared.configure()
     }

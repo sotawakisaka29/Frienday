@@ -170,7 +170,7 @@ struct AuthView: View {
                 do {
                     _ = try await userRepository.fetchProfile(userId: firebaseUser.uid)
                 } catch {
-                    try? authViewModel.signOut()
+                    try? await authViewModel.signOut()
                     message = "初回のGoogleログインでは、上の切り替えを「新規登録」にして表示名と生年月日を入力してください。"
                 }
             }

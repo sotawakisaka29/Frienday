@@ -224,6 +224,32 @@ final class SettingsViewModel {
         }
     }
 
+    /// 保存していないプロフィールの変更を取り消し、最後に保存した内容へ戻します。
+    func discardProfileChanges() {
+        guard let profile else {
+            pendingProfileImageData = nil
+            removesProfileImage = false
+            hasProfileChanges = false
+            clearFeedback()
+            return
+        }
+
+        profileDisplayName = profile.displayName
+        profileImageURL = profile.profileImageURL
+        pendingProfileImageData = nil
+        profileImageColorHex = profile.imageColorHex
+        removesProfileImage = false
+
+        var components = DateComponents()
+        components.year = profile.birthYear
+        components.month = profile.birthMonth
+        components.day = profile.birthDay
+        profileBirthday = Calendar.current.date(from: components) ?? Date()
+
+        hasProfileChanges = false
+        clearFeedback()
+    }
+
     func updateNotifications(items: [BirthdayDisplayItem]) async {
         isUpdatingNotifications = true
         successMessage = nil

@@ -59,4 +59,12 @@ enum ValidationUtility {
         guard !normalized.isEmpty else { throw AppError.invalidInviteCode }
         return normalized
     }
+
+    /// 個人チャットの本文を空白除去後1〜50文字に整えます。
+    static func validateChatMessage(_ value: String) throws -> String {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw AppError.emptyChatMessage }
+        guard trimmed.count <= 50 else { throw AppError.chatMessageTooLong }
+        return trimmed
+    }
 }
