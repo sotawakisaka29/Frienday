@@ -52,10 +52,16 @@ struct HomeView: View {
                 .font(.headline)
                 .foregroundStyle(.secondary)
 
-            if let firstItem = viewModel.upcomingItems.first {
-                FeaturedBirthdayView(item: firstItem)
+            let upcomingItems = viewModel.upcomingItems
+            if let firstItem = upcomingItems.first {
+                let featuredItems = upcomingItems.filter {
+                    $0.user.birthMonth == firstItem.user.birthMonth
+                        && $0.user.birthDay == firstItem.user.birthDay
+                }
+                RotatingFeaturedBirthdayView(items: featuredItems)
 
-                let remainingItems = Array(viewModel.upcomingItems.dropFirst())
+                let featuredItemIDs = Set(featuredItems.map(\.id))
+                let remainingItems = upcomingItems.filter { !featuredItemIDs.contains($0.id) }
                 if !remainingItems.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("このあとの誕生日")
@@ -129,6 +135,49 @@ struct HomeView: View {
     private func load() async {
         guard let userId = authViewModel.currentUser?.uid else { return }
         await viewModel.load(userId: userId)
+    }
+}
+
+/// 同じ誕生日の人を、3秒ごとにフェードで切り替えます。
+private struct RotatingFeaturedBirthdayView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var currentIndex = 0
+
+    let items: [BirthdayDisplayItem]
+
+    var body: some View {
+        ZStack {
+            ForEach(items.indices, id: \.self) { index in
+                if index == visibleIndex {
+                    FeaturedBirthdayView(item: items[index])
+                        .transition(.opacity)
+                }
+            }
+        }
+        .task(id: rotationKey) {
+            currentIndex = 0
+            guard items.count > 1 else { return }
+
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: .seconds(3))
+                } catch {
+                    return
+                }
+
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.6)) {
+                    currentIndex = (currentIndex + 1) % items.count
+                }
+            }
+        }
+    }
+
+    private var visibleIndex: Int {
+        min(currentIndex, max(0, items.count - 1))
+    }
+
+    private var rotationKey: String {
+        items.map(\.id).joined(separator: "|")
     }
 }
 

@@ -106,37 +106,71 @@ struct ProfileAvatarView: View {
     }
 }
 
-/// プロフィールのイメージカラーをスウォッチから選択します。
+/// プロフィールのイメージカラーを既存色か作成した色から選択します。
 struct ProfileColorPicker: View {
     @Binding var selection: String
     private let columns = Array(repeating: GridItem(.flexible()), count: 4)
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 12) {
-            ForEach(ProfileColor.allCases) { profileColor in
-                Button {
-                    selection = profileColor.rawValue
-                } label: {
-                    Circle()
-                        .fill(Color(profileHex: profileColor.rawValue))
-                        .frame(width: 32, height: 32)
-                        .overlay {
-                            if selection == profileColor.rawValue {
-                                Image(systemName: "checkmark")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                        .overlay {
-                            Circle()
-                                .stroke(.primary.opacity(selection == profileColor.rawValue ? 0.7 : 0), lineWidth: 2)
-                        }
+        VStack(alignment: .leading, spacing: 14) {
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(ProfileColor.allCases) { profileColor in
+                    colorButton(
+                        hex: profileColor.rawValue,
+                        accessibilityLabel: "用意されたイメージカラー"
+                    )
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("イメージカラー")
-                .accessibilityAddTraits(selection == profileColor.rawValue ? .isSelected : [])
+
+                if isCustomSelection {
+                    colorButton(
+                        hex: selection,
+                        accessibilityLabel: "作成したイメージカラー"
+                    )
+                }
+            }
+
+            ColorPicker(selection: customColorBinding, supportsOpacity: false) {
+                Label("好きな色を追加", systemImage: "plus.circle")
             }
         }
+    }
+
+    private var isCustomSelection: Bool {
+        ProfileColor(rawValue: selection) == nil
+    }
+
+    private var customColorBinding: Binding<Color> {
+        Binding {
+            Color(profileHex: selection)
+        } set: { color in
+            guard let colorHex = color.profileHex else { return }
+            selection = colorHex
+        }
+    }
+
+    /// 色の選択状態が分かる丸いボタンを表示します。
+    private func colorButton(hex: String, accessibilityLabel: String) -> some View {
+        Button {
+            selection = hex
+        } label: {
+            Circle()
+                .fill(Color(profileHex: hex))
+                .frame(width: 32, height: 32)
+                .overlay {
+                    if selection == hex {
+                        Image(systemName: "checkmark")
+                            .font(.caption.bold())
+                            .foregroundStyle(.white)
+                    }
+                }
+                .overlay {
+                    Circle()
+                        .stroke(.primary.opacity(selection == hex ? 0.7 : 0), lineWidth: 2)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(selection == hex ? .isSelected : [])
     }
 }
 
@@ -150,6 +184,7 @@ struct ProfileColorPicker: View {
             size: 88
         )
         ProfileColorPicker(selection: .constant(ProfileColor.teal.rawValue))
+        ProfileColorPicker(selection: .constant("#F28C28"))
     }
     .padding()
 }

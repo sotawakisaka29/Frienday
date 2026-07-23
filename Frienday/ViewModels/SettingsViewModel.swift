@@ -101,8 +101,8 @@ final class SettingsViewModel {
 
     /// イメージカラーを編集中のプロフィールへ反映します。
     func setProfileImageColor(_ colorHex: String) {
-        guard ProfileColor(rawValue: colorHex) != nil else { return }
-        profileImageColorHex = colorHex
+        guard let normalizedHex = ProfileColor.normalizedHex(colorHex) else { return }
+        profileImageColorHex = normalizedHex
         updateProfileChangeState()
         clearFeedback()
     }

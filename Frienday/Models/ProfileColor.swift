@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// プロフィールで選べるイメージカラーです。
+/// プロフィールですぐに選べるイメージカラーです。
 enum ProfileColor: String, CaseIterable, Identifiable {
     case blue = "#2F80ED"
     case teal = "#008C95"
@@ -19,4 +19,11 @@ enum ProfileColor: String, CaseIterable, Identifiable {
     case charcoal = "#4F4F4F"
 
     var id: String { rawValue }
+
+    /// 入力された色を保存用の`#RRGGBB`形式に整えます。
+    static func normalizedHex(_ hex: String) -> String? {
+        let value = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        guard value.count == 6, Int(value, radix: 16) != nil else { return nil }
+        return "#\(value.uppercased())"
+    }
 }
