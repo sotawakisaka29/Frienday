@@ -30,6 +30,9 @@ final class FriendayAppDelegate: NSObject, UIApplicationDelegate, UNUserNotifica
     ) {
 #if canImport(FirebaseMessaging)
         Messaging.messaging().apnsToken = deviceToken
+        Task { @MainActor in
+            await PushNotificationService.shared.registerMessagingTokenAfterAPNsRegistration()
+        }
 #endif
     }
 

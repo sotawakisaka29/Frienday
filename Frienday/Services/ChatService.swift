@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import Foundation
+import OSLog
 
 /// Firestoreのリアルタイム監視を終了する処理です。
 typealias ChatListenerCancellation = () -> Void
@@ -14,6 +15,10 @@ typealias ChatListenerCancellation = () -> Void
 /// 個人チャット、接続、ブロック、通報をFirestoreで管理します。
 struct ChatService {
     private static let maximumBatchOperations = 400
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "Frienday",
+        category: "DirectChat"
+    )
 
     private let database: Firestore
 
@@ -141,30 +146,32 @@ struct ChatService {
         let chat = DirectChat(chatId: chatId, participantIds: [userId, otherUserId])
 
         do {
-            _ = try await database.runTransaction { transaction, errorPointer -> Any? in
-                do {
-                    let snapshot = try transaction.getDocument(chatRef)
-                    if snapshot.exists {
-                        guard let data = snapshot.data(),
-                              let storedChat = DirectChat(id: snapshot.documentID, data: data),
-                              storedChat.participantIds == chat.participantIds else {
-                            errorPointer?.pointee = NSError(
-                                domain: "Frienday.InvalidDirectChat",
-                                code: 1
-                            )
-                            return nil
-                        }
-                    } else {
-                        transaction.setData(chat.dataForCreate(), forDocument: chatRef)
-                    }
-                    return nil
-                } catch let error as NSError {
-                    errorPointer?.pointee = error
-                    return nil
-                }
+            let snapshot = try await chatRef.getDocument()
+            if let storedChat = try validatedChat(from: snapshot, expected: chat) {
+                return storedChat
             }
+        } catch {
+            // 未作成ドキュメントの読み取りはルール上permission-deniedになるため、
+            // その場合だけ安全なcreateを続行します。
+            guard AppError.map(error) == .permissionDenied else {
+                logFirebaseError(error, operation: "ensureChat.read")
+                throw AppError.map(error)
+            }
+        }
+
+        do {
+            try await chatRef.setData(chat.dataForCreate())
             return chat
         } catch {
+            let createError = error
+
+            // 2人が同時に初回画面を開いた場合は、先に作成された内容を採用します。
+            if let snapshot = try? await chatRef.getDocument(),
+               let storedChat = try? validatedChat(from: snapshot, expected: chat) {
+                return storedChat
+            }
+
+            logFirebaseError(createError, operation: "ensureChat.create")
             throw AppError.map(error)
         }
     }
@@ -228,8 +235,30 @@ struct ChatService {
                 .document(message.messageId)
                 .setData(validatedMessage.dataForSend())
         } catch {
+            logFirebaseError(error, operation: "sendMessage")
             throw AppError.map(error)
         }
+    }
+
+    /// 本文やユーザー情報を含めず、原因の特定に必要なFirebaseのエラーだけを記録します。
+    private func logFirebaseError(_ error: Error, operation: String) {
+        let nsError = error as NSError
+        Self.logger.error(
+            "\(operation, privacy: .public) failed: domain=\(nsError.domain, privacy: .public) code=\(nsError.code) description=\(nsError.localizedDescription, privacy: .public)"
+        )
+    }
+
+    private func validatedChat(
+        from snapshot: DocumentSnapshot,
+        expected chat: DirectChat
+    ) throws -> DirectChat? {
+        guard snapshot.exists else { return nil }
+        guard let data = snapshot.data(),
+              let storedChat = DirectChat(id: snapshot.documentID, data: data),
+              storedChat.participantIds == chat.participantIds else {
+            throw AppError.chatUnavailable
+        }
+        return storedChat
     }
 
     /// 送信者本人のメッセージを削除します。

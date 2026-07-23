@@ -36,6 +36,21 @@ struct DirectChatView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(.bar)
+            } else if !viewModel.isChatAvailable {
+                HStack(spacing: 10) {
+                    if viewModel.isLoading {
+                        ProgressView()
+                        Text("チャットを準備しています…")
+                    } else {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                        Text("チャットを利用できません。前の画面に戻って再度お試しください。")
+                    }
+                }
+                .font(.callout)
+                .foregroundStyle(viewModel.isLoading ? Color.secondary : Color.red)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.bar)
             } else {
                 ChatComposerView(
                     text: draftBinding,

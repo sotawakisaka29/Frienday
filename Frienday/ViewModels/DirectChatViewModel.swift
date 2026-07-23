@@ -22,7 +22,8 @@ final class DirectChatViewModel {
     let contact: ChatContact
     var draft = ""
     private(set) var messages: [ChatMessage] = []
-    private(set) var isLoading = false
+    private(set) var isLoading = true
+    private(set) var isChatAvailable = false
     private(set) var isBlocked: Bool
     private(set) var isUpdatingBlock = false
     private(set) var errorMessage: String?
@@ -48,6 +49,7 @@ final class DirectChatViewModel {
         !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && draft.count <= 50
             && !isBlocked
+            && isChatAvailable
     }
 
     /// チャットを用意して、最新メッセージのリアルタイム監視を始めます。
@@ -55,6 +57,7 @@ final class DirectChatViewModel {
         stop()
         currentUserId = userId
         isLoading = true
+        isChatAvailable = false
         errorMessage = nil
 
         do {
@@ -66,12 +69,14 @@ final class DirectChatViewModel {
                 userId: userId,
                 otherUserId: contact.user.userId
             )
+            isChatAvailable = true
             startMessageListener()
         } catch {
             let appError = AppError.map(error)
             errorMessage = appError == .permissionDenied
                 ? AppError.chatUnavailable.message
                 : appError.message
+            isChatAvailable = false
             isLoading = false
         }
     }
@@ -86,6 +91,10 @@ final class DirectChatViewModel {
     func send(isConnected: Bool) async {
         guard let currentUserId else {
             errorMessage = AppError.notSignedIn.message
+            return
+        }
+        guard isChatAvailable else {
+            errorMessage = AppError.chatUnavailable.message
             return
         }
 
@@ -119,6 +128,10 @@ final class DirectChatViewModel {
     /// 失敗したメッセージを同じIDで再送し、重複を防ぎます。
     func retry(_ message: ChatMessage, isConnected: Bool) async {
         guard message.senderId == currentUserId else { return }
+        guard isChatAvailable else {
+            errorMessage = AppError.chatUnavailable.message
+            return
+        }
         guard isConnected else {
             errorMessage = AppError.chatSendFailed.message
             return
@@ -222,6 +235,7 @@ final class DirectChatViewModel {
                     self.errorMessage = appError == .permissionDenied
                         ? AppError.chatUnavailable.message
                         : appError.message
+                    self.isChatAvailable = false
                     self.isLoading = false
                     return
                 }

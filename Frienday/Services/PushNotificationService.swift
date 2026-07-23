@@ -52,16 +52,35 @@ final class PushNotificationService {
         UIApplication.shared.registerForRemoteNotifications()
 
 #if canImport(FirebaseMessaging)
-        let token = try await Messaging.messaging().token()
-        try await register(token: token, userId: userId)
+        if Messaging.messaging().apnsToken != nil,
+           let token = Messaging.messaging().fcmToken {
+            try await register(token: token, userId: userId)
+        }
 #else
         throw AppError.pushNotificationsNotConfigured
+#endif
+    }
+
+    /// APNsへの端末登録が完了した後、FCMトークンを取得して保存します。
+    func registerMessagingTokenAfterAPNsRegistration() async {
+#if canImport(FirebaseMessaging)
+        guard Messaging.messaging().apnsToken != nil else { return }
+
+        do {
+            let token = try await Messaging.messaging().token()
+            await receiveRegistrationToken(token)
+        } catch {
+            return
+        }
 #endif
     }
 
     /// Firebase Messagingから更新されたトークンを受け取って保存します。
     func receiveRegistrationToken(_ token: String) async {
         registrationToken = token
+#if canImport(FirebaseMessaging)
+        guard Messaging.messaging().apnsToken != nil else { return }
+#endif
         guard let userId = Auth.auth().currentUser?.uid else { return }
         try? await register(token: token, userId: userId)
     }
