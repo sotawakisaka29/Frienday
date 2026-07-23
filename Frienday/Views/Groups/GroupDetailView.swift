@@ -49,28 +49,15 @@ struct GroupDetailView: View {
             Section("メンバー") {
                 if viewModel.isLoading {
                     ProgressView()
-                } else if viewModel.items.isEmpty {
+                } else if viewModel.memberProfiles.isEmpty {
                     ContentUnavailableView("メンバーを読み込めません", systemImage: "person")
                 } else {
-                    ForEach(viewModel.items) { item in
-                        HStack(spacing: 12) {
-                            ProfileAvatarView(user: item.user, size: 48)
-
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Text(item.user.displayName)
-                                        .font(.headline)
-                                    Spacer()
-                                    Text(item.member.role.label)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                                Text(item.visibleBirthdayText)
-                                Text("あと\(item.daysUntilBirthday)日")
-                                    .foregroundStyle(.secondary)
-                            }
+                    ForEach(viewModel.memberProfiles) { profile in
+                        NavigationLink {
+                            GroupMemberProfileView(profile: profile)
+                        } label: {
+                            GroupMemberRow(profile: profile)
                         }
-                        .accessibilityLabel("\(item.user.displayName)、\(item.visibleBirthdayText)、\(item.member.role.label)、あと\(item.daysUntilBirthday)日")
                     }
                 }
             }
@@ -135,4 +122,61 @@ struct GroupDetailView: View {
             dismiss()
         }
     }
+}
+
+/// グループ一覧にメンバーの概要を表示します。
+private struct GroupMemberRow: View {
+    let profile: GroupMemberProfile
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ProfileAvatarView(user: profile.user, size: 48)
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(profile.user.displayName)
+                        .font(.headline)
+                    Spacer()
+                    Text(profile.member.role.label)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Text(profile.visibleBirthdayText)
+
+                if let daysUntilText = profile.daysUntilText {
+                    Text(daysUntilText)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint("プロフィールを開きます")
+    }
+
+    /// VoiceOver向けに公開中の情報だけを読み上げます。
+    private var accessibilityLabel: String {
+        let values = [
+            profile.user.displayName,
+            profile.member.role.label,
+            profile.visibleBirthdayText,
+            profile.daysUntilText
+        ]
+        return values.compactMap { $0 }.joined(separator: "、")
+    }
+}
+
+#Preview {
+    NavigationStack {
+        GroupDetailView(
+            group: BirthdayGroup(
+                groupId: "preview-group",
+                name: "サンプルグループ",
+                ownerId: "preview-user",
+                inviteCode: "ABC123"
+            )
+        )
+    }
+    .environment(AuthViewModel())
 }

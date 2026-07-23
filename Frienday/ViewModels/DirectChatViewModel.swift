@@ -98,9 +98,10 @@ final class DirectChatViewModel {
             return
         }
 
+        let submittedDraft = draft
         let text: String
         do {
-            text = try ValidationUtility.validateChatMessage(draft)
+            text = try ValidationUtility.validateChatMessage(submittedDraft)
         } catch {
             errorMessage = AppError.map(error).message
             return
@@ -113,7 +114,6 @@ final class DirectChatViewModel {
             clientCreatedAt: Date(),
             deliveryState: isConnected ? .sending : .failed
         )
-        draft = ""
         localMessages[message.messageId] = message
         rebuildMessages()
 
@@ -122,7 +122,9 @@ final class DirectChatViewModel {
             return
         }
 
-        await send(message)
+        if await send(message), draft == submittedDraft {
+            draft = ""
+        }
     }
 
     /// 失敗したメッセージを同じIDで再送し、重複を防ぎます。
@@ -139,7 +141,7 @@ final class DirectChatViewModel {
 
         localMessages[message.messageId] = message.withDeliveryState(.sending)
         rebuildMessages()
-        await send(message.withDeliveryState(.sending))
+        _ = await send(message.withDeliveryState(.sending))
     }
 
     /// 自分が送ったメッセージだけを削除します。
@@ -252,17 +254,20 @@ final class DirectChatViewModel {
         }
     }
 
-    private func send(_ message: ChatMessage) async {
+    /// Firebaseへの保存に成功したかを返します。
+    private func send(_ message: ChatMessage) async -> Bool {
         scheduleDelayNotice(messageId: message.messageId)
 
         do {
             try await chatRepository.sendMessage(chatId: contact.chatId, message: message)
+            return true
         } catch {
             delayTasks[message.messageId]?.cancel()
             delayTasks.removeValue(forKey: message.messageId)
             localMessages[message.messageId] = message.withDeliveryState(.failed)
             errorMessage = AppError.chatSendFailed.message
             rebuildMessages()
+            return false
         }
     }
 

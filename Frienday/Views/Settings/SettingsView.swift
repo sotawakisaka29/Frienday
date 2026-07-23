@@ -149,6 +149,7 @@ struct SettingsView: View {
                     Button("キャンセル", role: .cancel) {
                         cancelProfileEditing()
                     }
+                    .buttonStyle(.borderless)
                     .disabled(viewModel.isSavingProfile)
 
                     Spacer()
@@ -162,6 +163,7 @@ struct SettingsView: View {
                             Label("保存", systemImage: "checkmark.circle")
                         }
                     }
+                    .buttonStyle(.borderless)
                     .disabled(viewModel.isSavingProfile)
                 }
             } else {

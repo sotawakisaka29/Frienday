@@ -15,8 +15,8 @@ enum GroupMemberRole: String, Codable, Hashable {
 
     var label: String {
         switch self {
-        case .owner: return "owner"
-        case .member: return "member"
+        case .owner: return "オーナー"
+        case .member: return "メンバー"
         }
     }
 }

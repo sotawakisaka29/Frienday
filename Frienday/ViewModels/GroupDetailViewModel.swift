@@ -18,7 +18,7 @@ final class GroupDetailViewModel {
     private let widgetSyncService: WidgetBirthdaySyncService
 
     let group: BirthdayGroup
-    private(set) var items: [BirthdayDisplayItem] = []
+    private(set) var memberProfiles: [GroupMemberProfile] = []
     private(set) var currentMember: GroupMember?
     private var currentUserBirthYear: Int?
     private(set) var showsBirthYear = false
@@ -53,15 +53,45 @@ final class GroupDetailViewModel {
             currentMember = members.first(where: { $0.userId == userId })
             showsBirthYear = currentMember?.showBirthYear ?? false
             currentUserBirthYear = (try? await userRepository.fetchProfile(userId: userId))?.birthYear
-            var users: [AppUser] = []
+            var profiles: [GroupMemberProfile] = []
 
-            for member in members where member.showBirthday {
+            for member in members {
                 if let user = try? await userRepository.fetchPublicProfile(userId: member.userId) {
-                    users.append(user)
+                    let nextBirthday: Date?
+                    let daysUntilBirthday: Int?
+
+                    if member.showBirthday {
+                        nextBirthday = birthdayService.nextBirthday(
+                            month: user.birthMonth,
+                            day: user.birthDay
+                        )
+                        daysUntilBirthday = birthdayService.daysUntilBirthday(
+                            month: user.birthMonth,
+                            day: user.birthDay
+                        )
+                    } else {
+                        nextBirthday = nil
+                        daysUntilBirthday = nil
+                    }
+
+                    profiles.append(
+                        GroupMemberProfile(
+                            user: user,
+                            member: member,
+                            group: group,
+                            nextBirthday: nextBirthday,
+                            daysUntilBirthday: daysUntilBirthday
+                        )
+                    )
                 }
             }
 
-            items = birthdayService.birthdayItems(users: users, members: members, group: group)
+            memberProfiles = profiles.sorted {
+                if $0.member.role != $1.member.role {
+                    return $0.member.role == .owner
+                }
+                return $0.user.displayName.localizedStandardCompare($1.user.displayName) == .orderedAscending
+            }
         } catch {
             errorMessage = AppError.map(error).message
         }
@@ -133,14 +163,14 @@ final class GroupDetailViewModel {
     }
 
     private func updateDisplayedMember(_ member: GroupMember) {
-        items = items.map { item in
-            guard item.member.userId == member.userId else { return item }
-            return BirthdayDisplayItem(
-                user: item.user,
-                group: item.group,
+        memberProfiles = memberProfiles.map { profile in
+            guard profile.member.userId == member.userId else { return profile }
+            return GroupMemberProfile(
+                user: profile.user,
                 member: member,
-                nextBirthday: item.nextBirthday,
-                daysUntilBirthday: item.daysUntilBirthday
+                group: profile.group,
+                nextBirthday: profile.nextBirthday,
+                daysUntilBirthday: profile.daysUntilBirthday
             )
         }
     }

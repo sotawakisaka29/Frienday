@@ -10,6 +10,7 @@ import SwiftUI
 /// 50文字までの本文入力と送信ボタンを表示します。
 struct ChatComposerView: View {
     @Binding var text: String
+    @FocusState private var isTextFieldFocused: Bool
     let isEnabled: Bool
     let onTextChange: (String) -> Void
     let onSend: () -> Void
@@ -18,6 +19,7 @@ struct ChatComposerView: View {
         VStack(spacing: 6) {
             HStack(alignment: .bottom, spacing: 10) {
                 TextField("メッセージ", text: $text, axis: .vertical)
+                    .focused($isTextFieldFocused)
                     .lineLimit(1...4)
                     .textFieldStyle(.plain)
                     .padding(.horizontal, 14)
@@ -50,6 +52,14 @@ struct ChatComposerView: View {
         .padding(.horizontal)
         .padding(.vertical, 10)
         .background(.bar)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("完了") {
+                    isTextFieldFocused = false
+                }
+            }
+        }
     }
 }
 

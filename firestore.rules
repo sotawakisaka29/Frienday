@@ -83,7 +83,8 @@ service cloud.firestore {
       allow read, create, update, delete: if isSelf(userId);
 
       match /groups/{groupId} {
-        allow read, create, update, delete: if isSelf(userId);
+        allow read, create, update: if isSelf(userId);
+        allow delete: if isSelf(userId) || isGroupOwner(groupId);
       }
 
       match /connections/{otherUserId} {
